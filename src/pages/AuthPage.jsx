@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowRightIcon,
@@ -22,6 +22,19 @@ const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Scroll to bottom if URL contains #bottom
+  React.useEffect(() => {
+    if (location.hash === "#bottom") {
+      setTimeout(() => {
+        const element = document.getElementById("bottom");
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    }
+  }, [location]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

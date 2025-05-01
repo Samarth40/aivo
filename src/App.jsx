@@ -19,6 +19,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import FeaturesPage from "./pages/FeaturesPage";
 import PricingPage from "./pages/PricingPage";
+import IntegrationsPage from "./pages/IntegrationsPage";
 
 const App = () => {
   return (
@@ -32,6 +33,7 @@ const App = () => {
             <Route path="register" element={<AuthPage type="register" />} />
             <Route path="features" element={<FeaturesPage />} />
             <Route path="pricing" element={<PricingPage />} />
+            <Route path="integrations" element={<IntegrationsPage />} />
           </Route>
 
           {/* Auth routes */}
