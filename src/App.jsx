@@ -17,6 +17,8 @@ import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import FeaturesPage from "./pages/FeaturesPage";
+import PricingPage from "./pages/PricingPage";
 
 const App = () => {
   return (
@@ -28,6 +30,8 @@ const App = () => {
             <Route index element={<HomePage />} />
             <Route path="login" element={<AuthPage type="login" />} />
             <Route path="register" element={<AuthPage type="register" />} />
+            <Route path="features" element={<FeaturesPage />} />
+            <Route path="pricing" element={<PricingPage />} />
           </Route>
 
           {/* Auth routes */}
