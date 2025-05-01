@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import "../styles/components/AnalyzePage.css";
 import {
   MagnifyingGlassIcon,
   DocumentTextIcon,
@@ -105,16 +106,16 @@ const AnalyzePage = () => {
   };
 
   return (
-    <div className="py-6">
+    <div className="analyze-page">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2 gradient-text">
+        <h1 className="analyze-page-title gradient-text">
           AI Search Visibility Analysis
         </h1>
-        <p className="text-gray-600 mb-8">
+        <p className="analyze-page-description">
           Analyze any product page to see how it performs in AI search systems.
         </p>
 
@@ -125,60 +126,54 @@ const AnalyzePage = () => {
             </h2>
 
             <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="analyze-tab-group">
                 <button
                   onClick={() => setActiveTab("url")}
-                  className={`flex items-center px-4 py-3 rounded-lg border ${
-                    activeTab === "url"
-                      ? "border-[#4f46e5] bg-[#4f46e5]/5"
-                      : "border-gray-200"
+                  className={`analyze-tab ${
+                    activeTab === "url" ? "active" : ""
                   }`}
                 >
-                  <LinkIcon className="h-5 w-5 mr-2 text-gray-500" />
+                  <LinkIcon className="analyze-tab-icon" />
                   <span>URL</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab("text")}
-                  className={`flex items-center px-4 py-3 rounded-lg border ${
-                    activeTab === "text"
-                      ? "border-[#4f46e5] bg-[#4f46e5]/5"
-                      : "border-gray-200"
+                  className={`analyze-tab ${
+                    activeTab === "text" ? "active" : ""
                   }`}
                 >
-                  <DocumentTextIcon className="h-5 w-5 mr-2 text-gray-500" />
+                  <DocumentTextIcon className="analyze-tab-icon" />
                   <span>Text</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab("document")}
-                  className={`flex items-center px-4 py-3 rounded-lg border ${
-                    activeTab === "document"
-                      ? "border-[#4f46e5] bg-[#4f46e5]/5"
-                      : "border-gray-200"
+                  className={`analyze-tab ${
+                    activeTab === "document" ? "active" : ""
                   }`}
                 >
-                  <DocumentDuplicateIcon className="h-5 w-5 mr-2 text-gray-500" />
+                  <DocumentDuplicateIcon className="analyze-tab-icon" />
                   <span>Document</span>
                 </button>
               </div>
 
               {activeTab === "url" && (
                 <div className="space-y-4">
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <div className="url-input-container">
+                    <div className="url-input-icon">
                       <LinkIcon className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
                       type="text"
-                      className="input pl-10"
+                      className="input url-input"
                       placeholder="https://example.com/your-product"
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
                     />
                   </div>
 
-                  <div className="flex items-center text-sm text-gray-500">
+                  <div className="recent-items-label">
                     <ClockIcon className="h-4 w-4 mr-1" />
                     <span>Recently analyzed:</span>
                   </div>
@@ -191,15 +186,11 @@ const AnalyzePage = () => {
                       <button
                         key={index}
                         onClick={() => setUrl(item)}
-                        className="flex items-center w-full p-2 text-left text-sm hover:bg-gray-50 rounded-md"
+                        className="recent-item"
                       >
-                        <span className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
-                          {index + 1}
-                        </span>
-                        <span className="text-gray-800 truncate flex-1">
-                          {item}
-                        </span>
-                        <ChevronRightIcon className="h-4 w-4 text-gray-400" />
+                        <span className="recent-item-number">{index + 1}</span>
+                        <span className="recent-item-text">{item}</span>
+                        <ChevronRightIcon className="recent-item-icon" />
                       </button>
                     ))}
                   </div>
@@ -216,12 +207,10 @@ const AnalyzePage = () => {
               )}
 
               {activeTab === "document" && (
-                <div className="border-2 border-dashed border-gray-300 rounded-xl p-10 text-center">
-                  <DocumentDuplicateIcon className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-600 mb-2">
-                    Drag & drop your file here
-                  </p>
-                  <p className="text-gray-500 text-sm mb-4">
+                <div className="file-upload-area">
+                  <DocumentDuplicateIcon className="file-upload-icon" />
+                  <p className="file-upload-text">Drag & drop your file here</p>
+                  <p className="file-upload-subtext">
                     Supports PDF, DOCX, HTML (Max 10MB)
                   </p>
                   <button className="btn btn-secondary">Browse Files</button>
@@ -255,26 +244,24 @@ const AnalyzePage = () => {
             initial="hidden"
             animate="visible"
           >
-            <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between">
+            <div className="results-header">
               <div>
-                <div className="flex items-center">
-                  <h2 className="text-xl font-semibold mr-3">
-                    Analysis Results
-                  </h2>
+                <div className="results-title-container">
+                  <h2 className="results-title">Analysis Results</h2>
                   <span className="badge badge-primary">Product Page</span>
                 </div>
-                <p className="text-gray-500 text-sm mt-1">{url}</p>
+                <p className="results-url">{url}</p>
               </div>
-              <div className="flex items-center mt-4 sm:mt-0">
+              <div className="results-actions">
                 <button
                   onClick={handleReset}
                   className="btn btn-secondary mr-3 flex items-center text-sm"
                 >
-                  <ArrowPathIcon className="h-4 w-4 mr-1" />
+                  <ArrowPathIcon className="action-button-icon" />
                   New Analysis
                 </button>
                 <button className="btn btn-accent flex items-center text-sm">
-                  <SparklesIcon className="h-4 w-4 mr-1" />
+                  <SparklesIcon className="action-button-icon" />
                   Optimize
                 </button>
               </div>
@@ -282,8 +269,8 @@ const AnalyzePage = () => {
 
             {/* Score Overview */}
             <motion.div variants={itemVariants} className="card mb-8">
-              <div className="flex flex-col md:flex-row items-center">
-                <div className="relative flex-shrink-0">
+              <div className="score-overview">
+                <div className="score-circle-container">
                   <svg className="w-40 h-40" viewBox="0 0 36 36">
                     <circle
                       cx="18"
@@ -306,46 +293,35 @@ const AnalyzePage = () => {
                       strokeDashoffset="25"
                       className="transition-all duration-1000 ease-out"
                     ></circle>
-                    <text
-                      x="18"
-                      y="18.5"
-                      textAnchor="middle"
-                      dy=".35em"
-                      className="text-3xl font-bold"
-                    >
-                      {analysisData.score}
-                    </text>
                   </svg>
 
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                    <div className="text-3xl font-bold text-gray-800">
+                  <div className="score-circle-text">
+                    <div className="score-circle-value">
                       {analysisData.score}
                     </div>
-                    <div className="text-sm text-center text-gray-500">
-                      out of 100
-                    </div>
+                    <div className="score-circle-label">out of 100</div>
                   </div>
                 </div>
 
-                <div className="ml-0 md:ml-8 mt-6 md:mt-0">
-                  <h3 className="text-xl font-bold mb-2">
+                <div className="score-details">
+                  <h3 className="score-details-title">
                     AI Search Visibility Score
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="score-details-description">
                     Your product page has moderate visibility in AI search
                     systems. With targeted improvements, you could see a
                     significant boost in how often your product is recommended.
                   </p>
-                  <div className="flex flex-wrap gap-3">
-                    <div className="flex items-center px-3 py-1 bg-[#4f46e5]/10 rounded-full">
-                      <ArrowTrendingUpIcon className="h-4 w-4 text-[#4f46e5] mr-1" />
-                      <span className="text-sm font-medium text-[#4f46e5]">
+                  <div className="score-badges">
+                    <div className="score-badge score-badge-primary">
+                      <ArrowTrendingUpIcon className="score-badge-icon text-[#4f46e5]" />
+                      <span className="score-badge-text-primary">
                         Top 40% of products
                       </span>
                     </div>
-                    <div className="flex items-center px-3 py-1 bg-green-100 rounded-full">
-                      <CheckCircleIcon className="h-4 w-4 text-green-600 mr-1" />
-                      <span className="text-sm font-medium text-green-600">
+                    <div className="score-badge score-badge-success">
+                      <CheckCircleIcon className="score-badge-icon text-green-600" />
+                      <span className="score-badge-text-success">
                         Good entity linking
                       </span>
                     </div>
@@ -361,35 +337,37 @@ const AnalyzePage = () => {
                 key={index}
                 className="card mb-6"
               >
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                  <div className="flex items-center">
+                <div className="recommendation-header">
+                  <div className="recommendation-title-container">
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center mr-4 ${
+                      className={`recommendation-score ${
                         rec.score >= 80
-                          ? "bg-green-100 text-green-600"
+                          ? "recommendation-score-good"
                           : rec.score >= 70
-                          ? "bg-blue-100 text-blue-600"
+                          ? "recommendation-score-moderate"
                           : rec.score >= 60
-                          ? "bg-yellow-100 text-yellow-600"
-                          : "bg-red-100 text-red-600"
+                          ? "recommendation-score-fair"
+                          : "recommendation-score-poor"
                       }`}
                     >
-                      <span className="text-lg font-bold">{rec.score}</span>
+                      <span className="recommendation-score-text">
+                        {rec.score}
+                      </span>
                     </div>
-                    <h3 className="text-lg font-semibold">{rec.category}</h3>
+                    <h3 className="recommendation-title">{rec.category}</h3>
                   </div>
 
-                  <div className="mt-4 md:mt-0">
-                    <div className="w-full md:w-48 bg-gray-200 rounded-full h-2">
+                  <div className="recommendation-progress">
+                    <div className="recommendation-progress-bg">
                       <div
-                        className={`h-2 rounded-full ${
+                        className={`recommendation-progress-bar ${
                           rec.score >= 80
-                            ? "bg-green-500"
+                            ? "recommendation-progress-good"
                             : rec.score >= 70
-                            ? "bg-blue-500"
+                            ? "recommendation-progress-moderate"
                             : rec.score >= 60
-                            ? "bg-yellow-500"
-                            : "bg-red-500"
+                            ? "recommendation-progress-fair"
+                            : "recommendation-progress-poor"
                         }`}
                         style={{ width: `${rec.score}%` }}
                       ></div>
@@ -397,19 +375,23 @@ const AnalyzePage = () => {
                   </div>
                 </div>
 
-                <p className="text-gray-600 mb-4">{rec.details}</p>
+                <p className="recommendation-details">{rec.details}</p>
 
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium mb-3">Suggestions:</h4>
-                  <ul className="space-y-2">
+                <div className="recommendation-suggestions">
+                  <h4 className="recommendation-suggestions-title">
+                    Suggestions:
+                  </h4>
+                  <ul className="recommendation-suggestions-list">
                     {rec.suggestions.map((suggestion, i) => (
-                      <li key={i} className="flex items-start">
-                        <span className="h-5 w-5 rounded-full bg-[#4f46e5]/10 flex items-center justify-center flex-shrink-0 mt-0.5 mr-2">
-                          <span className="text-xs font-medium text-[#4f46e5]">
+                      <li key={i} className="recommendation-suggestion-item">
+                        <span className="recommendation-suggestion-number">
+                          <span className="recommendation-suggestion-number-text">
                             {i + 1}
                           </span>
                         </span>
-                        <span className="text-gray-700">{suggestion}</span>
+                        <span className="recommendation-suggestion-text">
+                          {suggestion}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -417,10 +399,7 @@ const AnalyzePage = () => {
               </motion.div>
             ))}
 
-            <motion.div
-              variants={itemVariants}
-              className="flex justify-center mt-8"
-            >
+            <motion.div variants={itemVariants} className="final-actions">
               <button className="btn btn-primary mr-4">
                 Generate Improvement Report
               </button>

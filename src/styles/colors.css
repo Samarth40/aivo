@@ -1,51 +1,92 @@
-/* Deep Ocean Dark Theme */
+/* Deep Ocean Dark Theme + Modern UI Theme */
 :root {
   /* Primary Colors */
-  --color-primary: #0EA5E9;
-  --color-primary-light: #38BDF8;
-  --color-primary-dark: #0369A1;
+  --color-primary: #4f46e5; /* Indigo - main brand color */
+  --color-primary-light: #818cf8;
+  --color-primary-dark: #3730a3;
 
   /* Secondary Colors */
-  --color-secondary: #38BDF8;
-  --color-secondary-light: #7DD3FC;
-  --color-secondary-dark: #0284C7;
+  --color-secondary: #0ea5e9; /* Sky blue */
+  --color-secondary-light: #38bdf8;
+  --color-secondary-dark: #0284c7;
 
   /* Neutral Colors */
-  --color-text-primary: #E2E8F0;
-  --color-text-secondary: #94A3B8;
-  --color-background: #0F172A;
-  --color-white: #1E293B;
-  --color-border: #334155;
+  --color-text-primary: #111827; /* Dark text for light mode */
+  --color-text-secondary: #4b5563;
+  --color-background: #f9fafb;
+  --color-white: #ffffff;
+  --color-border: #e5e7eb;
 
   /* Accent Colors */
-  --color-success: #10B981;
-  --color-success-light: #34D399;
-  --color-success-dark: #059669;
+  --color-success: #22c55e; /* Green */
+  --color-success-light: #86efac;
+  --color-success-dark: #16a34a;
 
-  --color-warning: #F59E0B;
-  --color-warning-light: #FBBF24;
-  --color-warning-dark: #D97706;
+  --color-warning: #f59e0b; /* Amber */
+  --color-warning-light: #fbbf24;
+  --color-warning-dark: #d97706;
 
-  --color-error: #EF4444;
-  --color-error-light: #F87171;
-  --color-error-dark: #DC2626;
+  --color-error: #ef4444; /* Red */
+  --color-error-light: #fca5a5;
+  --color-error-dark: #dc2626;
 
-  --color-accent: #8B5CF6;
-  --color-accent-light: #A78BFA;
-  --color-accent-dark: #7C3AED;
+  --color-accent: #10b981; /* Emerald */
+  --color-accent-light: #34d399;
+  --color-accent-dark: #059669;
+
+  /* Gray Scale */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
 
   /* Component-specific colors */
-  --color-card-background: #1E293B;
+  --color-card-background: var(--color-white);
+  --color-sidebar-from: var(--color-gray-800);
+  --color-sidebar-to: var(--color-gray-900);
   --color-button-primary-bg: var(--color-primary);
-  --color-button-primary-text: #0F172A;
-  --color-button-secondary-bg: transparent;
-  --color-button-secondary-text: var(--color-primary);
-  --color-button-secondary-border: var(--color-primary);
-  --color-input-border: #334155;
+  --color-button-primary-text: var(--color-white);
+  --color-button-secondary-bg: var(--color-secondary);
+  --color-button-secondary-text: var(--color-white);
+  --color-button-accent-bg: var(--color-accent);
+  --color-button-accent-text: var(--color-white);
+  --color-input-border: var(--color-gray-300);
   --color-input-focus: var(--color-primary);
+  --color-gradient-from: var(--color-primary);
+  --color-gradient-to: var(--color-secondary);
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* Border Radius */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-xl: 1rem;
+  --border-radius-full: 9999px;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-xxl: 3rem;
+
+  /* Dark mode - these can be used with a .dark-mode class or media query */
+  --dark-color-text-primary: #e2e8f0;
+  --dark-color-text-secondary: #94a3b8;
+  --dark-color-background: #0f172a;
+  --dark-color-white: #1e293b;
+  --dark-color-border: #334155;
 }

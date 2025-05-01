@@ -1,46 +1,69 @@
-import React from 'react';
-import '../../styles/main.css';
+import React from "react";
+import "../../styles/main.css";
+import "../../styles/components/Footer.css";
 
 /**
  * Footer component for the application
  */
 const Footer = () => {
   return (
-    <footer style={{
-      backgroundColor: '#0A1122', // Slightly darker than the background
-      color: 'var(--color-text-primary)',
-      padding: '2rem',
-      marginTop: '2rem',
-      borderTop: '1px solid var(--color-border)',
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '2rem' }}>
+    <footer className="footer">
+      <div className="footer-container">
         <div>
-          <h3 style={{ color: 'var(--color-primary)', marginBottom: '1rem' }}>AIVO</h3>
+          <h3 className="footer-heading">AIVO</h3>
           <p>AI Search Visibility Optimizer</p>
           <p>© {new Date().getFullYear()} AIVO. All rights reserved.</p>
         </div>
 
         <div>
-          <h4 style={{ color: 'var(--color-primary-light)', marginBottom: '1rem' }}>Features</h4>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            <li style={{ marginBottom: '0.5rem' }}><a href="#" style={{ color: 'var(--color-text-primary)' }}>AI Query Simulation</a></li>
-            <li style={{ marginBottom: '0.5rem' }}><a href="#" style={{ color: 'var(--color-text-primary)' }}>Content Analysis</a></li>
-            <li style={{ marginBottom: '0.5rem' }}><a href="#" style={{ color: 'var(--color-text-primary)' }}>Entity Enhancement</a></li>
-            <li style={{ marginBottom: '0.5rem' }}><a href="#" style={{ color: 'var(--color-text-primary)' }}>Competitive Analysis</a></li>
+          <h4 className="footer-section-heading">Features</h4>
+          <ul className="footer-nav-list">
+            <li className="footer-nav-item">
+              <a href="#" className="footer-link">
+                AI Query Simulation
+              </a>
+            </li>
+            <li className="footer-nav-item">
+              <a href="#" className="footer-link">
+                Content Analysis
+              </a>
+            </li>
+            <li className="footer-nav-item">
+              <a href="#" className="footer-link">
+                Entity Enhancement
+              </a>
+            </li>
+            <li className="footer-nav-item">
+              <a href="#" className="footer-link">
+                Competitive Analysis
+              </a>
+            </li>
           </ul>
         </div>
 
         <div>
-          <h4 style={{ color: 'var(--color-primary-light)', marginBottom: '1rem' }}>Resources</h4>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            <li style={{ marginBottom: '0.5rem' }}><a href="#" style={{ color: 'var(--color-text-primary)' }}>Documentation</a></li>
-            <li style={{ marginBottom: '0.5rem' }}><a href="#" style={{ color: 'var(--color-text-primary)' }}>Blog</a></li>
-            <li style={{ marginBottom: '0.5rem' }}><a href="#" style={{ color: 'var(--color-text-primary)' }}>Support</a></li>
+          <h4 className="footer-section-heading">Resources</h4>
+          <ul className="footer-nav-list">
+            <li className="footer-nav-item">
+              <a href="#" className="footer-link">
+                Documentation
+              </a>
+            </li>
+            <li className="footer-nav-item">
+              <a href="#" className="footer-link">
+                Blog
+              </a>
+            </li>
+            <li className="footer-nav-item">
+              <a href="#" className="footer-link">
+                Support
+              </a>
+            </li>
           </ul>
         </div>
 
         <div>
-          <h4 style={{ color: 'var(--color-primary-light)', marginBottom: '1rem' }}>Contact</h4>
+          <h4 className="footer-section-heading">Contact</h4>
           <p>info@aivo.example.com</p>
           <p>+1 (555) 123-4567</p>
         </div>

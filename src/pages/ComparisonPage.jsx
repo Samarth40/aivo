@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import '../styles/components/ComparisonPage.css';
 
 const ComparisonPage = () => {
   const [comparisonMode, setComparisonMode] = useState("visibility");
@@ -135,69 +136,61 @@ const ComparisonPage = () => {
   // Helper function to determine the status color based on value comparison
   const getStatusColor = (yourValue, competitorValue) => {
     const diff = yourValue - competitorValue;
-    if (diff >= 5) return "text-green-600";
-    if (diff <= -5) return "text-red-600";
+    if (diff >= 5) return "feature-status-positive";
+    if (diff <= -5) return "feature-status-negative";
     return "text-yellow-600";
   };
 
   // Helper function to determine feature comparison status
   const getFeatureStatus = (feature, competitorHasFeature) => {
     if (comparisonData.yourProduct.features[feature] === competitorHasFeature) {
-      return "text-gray-600"; // Same status (both have or both don't have)
+      return "feature-status-neutral"; // Same status (both have or both don't have)
     } else if (
       comparisonData.yourProduct.features[feature] &&
       !competitorHasFeature
     ) {
-      return "text-green-600"; // You have it, competitor doesn't
+      return "feature-status-positive"; // You have it, competitor doesn't
     } else {
-      return "text-red-600"; // Competitor has it, you don't
+      return "feature-status-negative"; // Competitor has it, you don't
     }
   };
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-2">Competitor Comparison</h1>
-        <p className="text-gray-600">
+    <div className="comparison-page-container">
+      <div className="comparison-page-header">
+        <h1 className="comparison-page-title">Competitor Comparison</h1>
+        <p className="comparison-page-description">
           See how your product stacks up against competitors in AI search
           visibility
         </p>
       </div>
 
       {/* Comparison Mode Selection */}
-      <div className="mb-6">
-        <div className="flex border-b border-gray-200">
-          <button
-            className={`py-3 px-6 ${
-              comparisonMode === "visibility"
-                ? "border-b-2 border-primary text-primary"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setComparisonMode("visibility")}
-          >
-            Visibility Metrics
-          </button>
-          <button
-            className={`py-3 px-6 ${
-              comparisonMode === "features"
-                ? "border-b-2 border-primary text-primary"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setComparisonMode("features")}
-          >
-            Feature Comparison
-          </button>
-          <button
-            className={`py-3 px-6 ${
-              comparisonMode === "strengths"
-                ? "border-b-2 border-primary text-primary"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            onClick={() => setComparisonMode("strengths")}
-          >
-            Strengths & Weaknesses
-          </button>
-        </div>
+      <div className="comparison-tab-nav">
+        <button
+          className={`comparison-tab-button ${
+            comparisonMode === "visibility" ? "active" : ""
+          }`}
+          onClick={() => setComparisonMode("visibility")}
+        >
+          Visibility Metrics
+        </button>
+        <button
+          className={`comparison-tab-button ${
+            comparisonMode === "features" ? "active" : ""
+          }`}
+          onClick={() => setComparisonMode("features")}
+        >
+          Feature Comparison
+        </button>
+        <button
+          className={`comparison-tab-button ${
+            comparisonMode === "strengths" ? "active" : ""
+          }`}
+          onClick={() => setComparisonMode("strengths")}
+        >
+          Strengths & Weaknesses
+        </button>
       </div>
 
       {/* Visibility Metrics Comparison */}
@@ -208,22 +201,22 @@ const ComparisonPage = () => {
             <h2 className="text-lg font-medium mb-6">
               Overall AI Visibility Score
             </h2>
-            <div className="flex flex-wrap">
-              <div className="w-full lg:w-2/3 pr-0 lg:pr-8">
+            <div className="metric-grid">
+              <div className="metric-chart-container">
                 <div className="space-y-6">
                   {/* Your Product */}
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-700">
+                  <div className="metric-item">
+                    <div className="metric-header">
+                      <span className="metric-label">
                         Your Product
                       </span>
-                      <span className="text-sm font-medium">
+                      <span className="metric-value">
                         {comparisonData.yourProduct.visibility}%
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div className="metric-bar">
                       <div
-                        className="bg-primary h-2.5 rounded-full"
+                        className="metric-bar-fill metric-primary"
                         style={{
                           width: `${comparisonData.yourProduct.visibility}%`,
                         }}
@@ -233,18 +226,18 @@ const ComparisonPage = () => {
 
                   {/* Competitors */}
                   {comparisonData.competitors.map((competitor, index) => (
-                    <div key={index}>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm font-medium text-gray-700">
+                    <div className="metric-item" key={index}>
+                      <div className="metric-header">
+                        <span className="metric-label">
                           {competitor.name}
                         </span>
-                        <span className="text-sm font-medium">
+                        <span className="metric-value">
                           {competitor.visibility}%
                         </span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div className="metric-bar">
                         <div
-                          className="bg-gray-600 h-2.5 rounded-full"
+                          className="metric-bar-fill metric-competitor"
                           style={{ width: `${competitor.visibility}%` }}
                         ></div>
                       </div>
@@ -252,18 +245,18 @@ const ComparisonPage = () => {
                   ))}
 
                   {/* Average */}
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-700">
+                  <div className="metric-item">
+                    <div className="metric-header">
+                      <span className="metric-label">
                         Competitor Average
                       </span>
-                      <span className="text-sm font-medium">
+                      <span className="metric-value">
                         {competitorAvg.visibility}%
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div className="metric-bar">
                       <div
-                        className="bg-yellow-500 h-2.5 rounded-full"
+                        className="metric-bar-fill metric-average"
                         style={{ width: `${competitorAvg.visibility}%` }}
                       ></div>
                     </div>
@@ -271,10 +264,10 @@ const ComparisonPage = () => {
                 </div>
               </div>
 
-              <div className="w-full lg:w-1/3 mt-6 lg:mt-0">
-                <div className="card bg-gray-50 h-full">
-                  <h3 className="font-medium mb-2">Analysis</h3>
-                  <p className="text-sm text-gray-600 mb-4">
+              <div className="metric-analysis-container">
+                <div className="analysis-card">
+                  <h3 className="analysis-title">Analysis</h3>
+                  <p className="analysis-text">
                     Your visibility score is{" "}
                     <span
                       className={getStatusColor(
@@ -293,14 +286,14 @@ const ComparisonPage = () => {
                     </span>
                     .
                   </p>
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium">Recommendations:</h4>
-                    <ul className="text-sm text-gray-600 space-y-1 list-disc pl-5">
-                      <li>
+                  <div>
+                    <h4 className="recommendations-title">Recommendations:</h4>
+                    <ul className="recommendations-list">
+                      <li className="recommendation-item">
                         Implement structured data for better AI comprehension
                       </li>
-                      <li>Add more specific use case examples</li>
-                      <li>Include comparative information with competitors</li>
+                      <li className="recommendation-item">Add more specific use case examples</li>
+                      <li className="recommendation-item">Include comparative information with competitors</li>
                     </ul>
                   </div>
                 </div>
@@ -312,100 +305,81 @@ const ComparisonPage = () => {
           <div className="card">
             <h2 className="text-lg font-medium mb-6">Detailed Metrics</h2>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="comparison-table">
+                <thead className="comparison-table-header">
                   <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
+                    <th className="comparison-table-header-cell">
                       Product
                     </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
+                    <th className="comparison-table-header-cell">
                       AI Query Match
                     </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
+                    <th className="comparison-table-header-cell">
                       Content Completeness
                     </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
+                    <th className="comparison-table-header-cell">
                       Overall Score
                     </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
+                    <th className="comparison-table-header-cell">
                       Trend
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="comparison-table-body">
                   {/* Your Product */}
-                  <tr className="bg-blue-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-medium text-gray-900">
+                  <tr className="comparison-table-row comparison-table-row-highlight">
+                    <td className="comparison-table-cell">
+                      <div className="comparison-table-cell-title">
                         {comparisonData.yourProduct.name}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="comparison-table-cell">
                       <div className="text-sm">
                         {comparisonData.yourProduct.queryMatch}%
                       </div>
-                      <div className="w-24 bg-gray-200 rounded-full h-1.5 mt-1">
+                      <div className="metric-bar-chart">
                         <div
-                          className="bg-primary h-1.5 rounded-full"
+                          className="metric-bar-fill metric-primary"
                           style={{
                             width: `${comparisonData.yourProduct.queryMatch}%`,
                           }}
                         ></div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="comparison-table-cell">
                       <div className="text-sm">
                         {comparisonData.yourProduct.contentCompleteness}%
                       </div>
-                      <div className="w-24 bg-gray-200 rounded-full h-1.5 mt-1">
+                      <div className="metric-bar-chart">
                         <div
-                          className="bg-primary h-1.5 rounded-full"
+                          className="metric-bar-fill metric-primary"
                           style={{
                             width: `${comparisonData.yourProduct.contentCompleteness}%`,
                           }}
                         ></div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="comparison-table-cell">
                       <div className="text-sm">
                         {comparisonData.yourProduct.visibility}%
                       </div>
-                      <div className="w-24 bg-gray-200 rounded-full h-1.5 mt-1">
+                      <div className="metric-bar-chart">
                         <div
-                          className="bg-primary h-1.5 rounded-full"
+                          className="metric-bar-fill metric-primary"
                           style={{
                             width: `${comparisonData.yourProduct.visibility}%`,
                           }}
                         ></div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center h-6">
+                    <td className="comparison-table-cell">
+                      <div className="trend-chart">
                         {comparisonData.yourProduct.trends.map((point, i) => (
                           <div
                             key={i}
-                            className="relative flex items-end h-full"
-                          >
-                            <div
-                              className="w-3 bg-primary mx-0.5 rounded-t"
-                              style={{ height: `${point * 0.6}%` }}
-                            ></div>
-                          </div>
+                            className="trend-bar bg-primary"
+                            style={{ height: `${point * 0.6}%` }}
+                          ></div>
                         ))}
                       </div>
                     </td>
@@ -413,58 +387,54 @@ const ComparisonPage = () => {
 
                   {/* Competitors */}
                   {comparisonData.competitors.map((competitor, index) => (
-                    <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="font-medium text-gray-900">
+                    <tr key={index} className="comparison-table-row">
+                      <td className="comparison-table-cell">
+                        <div className="comparison-table-cell-title">
                           {competitor.name}
                         </div>
-                        <div className="text-xs text-gray-500 truncate max-w-xs">
+                        <div className="comparison-table-cell-url">
                           {competitor.url}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="comparison-table-cell">
                         <div className="text-sm">{competitor.queryMatch}%</div>
-                        <div className="w-24 bg-gray-200 rounded-full h-1.5 mt-1">
+                        <div className="metric-bar-chart">
                           <div
-                            className="bg-gray-600 h-1.5 rounded-full"
+                            className="metric-bar-fill metric-competitor"
                             style={{ width: `${competitor.queryMatch}%` }}
                           ></div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="comparison-table-cell">
                         <div className="text-sm">
                           {competitor.contentCompleteness}%
                         </div>
-                        <div className="w-24 bg-gray-200 rounded-full h-1.5 mt-1">
+                        <div className="metric-bar-chart">
                           <div
-                            className="bg-gray-600 h-1.5 rounded-full"
+                            className="metric-bar-fill metric-competitor"
                             style={{
                               width: `${competitor.contentCompleteness}%`,
                             }}
                           ></div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="comparison-table-cell">
                         <div className="text-sm">{competitor.visibility}%</div>
-                        <div className="w-24 bg-gray-200 rounded-full h-1.5 mt-1">
+                        <div className="metric-bar-chart">
                           <div
-                            className="bg-gray-600 h-1.5 rounded-full"
+                            className="metric-bar-fill metric-competitor"
                             style={{ width: `${competitor.visibility}%` }}
                           ></div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center h-6">
+                      <td className="comparison-table-cell">
+                        <div className="trend-chart">
                           {competitor.trends.map((point, i) => (
                             <div
                               key={i}
-                              className="relative flex items-end h-full"
-                            >
-                              <div
-                                className="w-3 bg-gray-600 mx-0.5 rounded-t"
-                                style={{ height: `${point * 0.6}%` }}
-                              ></div>
-                            </div>
+                              className="trend-bar bg-gray-600"
+                              style={{ height: `${point * 0.6}%` }}
+                            ></div>
                           ))}
                         </div>
                       </td>
@@ -472,44 +442,44 @@ const ComparisonPage = () => {
                   ))}
 
                   {/* Average */}
-                  <tr className="bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-medium text-gray-900">
+                  <tr className="comparison-table-row bg-gray-50">
+                    <td className="comparison-table-cell">
+                      <div className="comparison-table-cell-title">
                         Competitor Average
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="comparison-table-cell">
                       <div className="text-sm">{competitorAvg.queryMatch}%</div>
-                      <div className="w-24 bg-gray-200 rounded-full h-1.5 mt-1">
+                      <div className="metric-bar-chart">
                         <div
-                          className="bg-yellow-500 h-1.5 rounded-full"
+                          className="metric-bar-fill metric-average"
                           style={{ width: `${competitorAvg.queryMatch}%` }}
                         ></div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="comparison-table-cell">
                       <div className="text-sm">
                         {competitorAvg.contentCompleteness}%
                       </div>
-                      <div className="w-24 bg-gray-200 rounded-full h-1.5 mt-1">
+                      <div className="metric-bar-chart">
                         <div
-                          className="bg-yellow-500 h-1.5 rounded-full"
+                          className="metric-bar-fill metric-average"
                           style={{
                             width: `${competitorAvg.contentCompleteness}%`,
                           }}
                         ></div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="comparison-table-cell">
                       <div className="text-sm">{competitorAvg.visibility}%</div>
-                      <div className="w-24 bg-gray-200 rounded-full h-1.5 mt-1">
+                      <div className="metric-bar-chart">
                         <div
-                          className="bg-yellow-500 h-1.5 rounded-full"
+                          className="metric-bar-fill metric-average"
                           style={{ width: `${competitorAvg.visibility}%` }}
                         ></div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="comparison-table-cell">
                       {/* No trend for average */}
                     </td>
                   </tr>
@@ -527,48 +497,43 @@ const ComparisonPage = () => {
             Feature Coverage Comparison
           </h2>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="comparison-table">
+              <thead className="comparison-table-header">
                 <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th className="comparison-table-header-cell">
                     Feature
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th className="comparison-table-header-cell">
                     Your Product
                   </th>
                   {comparisonData.competitors.map((competitor, index) => (
                     <th
                       key={index}
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="comparison-table-header-cell"
                     >
                       {competitor.name}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="comparison-table-body">
                 {Object.entries(comparisonData.yourProduct.features).map(
                   ([feature, value], index) => (
                     <tr
                       key={index}
-                      className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                      className={`comparison-table-row ${
+                        index % 2 === 0 ? "" : "bg-gray-50"
+                      }`}
                     >
-                      <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="comparison-table-cell comparison-table-cell-title">
                         {feature}
                       </td>
-                      <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
+                      <td className="comparison-table-cell">
                         {typeof value === "boolean" ? (
                           value ? (
-                            <span className="text-green-600">✓</span>
+                            <span className="feature-status-positive">✓</span>
                           ) : (
-                            <span className="text-red-600">✕</span>
+                            <span className="feature-status-negative">✕</span>
                           )
                         ) : (
                           value
@@ -580,7 +545,7 @@ const ComparisonPage = () => {
                           return (
                             <td
                               key={compIndex}
-                              className="px-6 py-3 whitespace-nowrap text-sm"
+                              className="comparison-table-cell"
                             >
                               <span
                                 className={getFeatureStatus(feature, compValue)}
@@ -601,21 +566,21 @@ const ComparisonPage = () => {
               </tbody>
             </table>
           </div>
-          <div className="mt-6 bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-medium mb-2">Feature Comparison Analysis</h3>
-            <p className="text-sm text-gray-600 mb-4">
+          <div className="feature-analysis">
+            <h3 className="analysis-title">Feature Comparison Analysis</h3>
+            <p className="analysis-text">
               Your product is missing the following features that competitors
               prominently highlight:
             </p>
-            <ul className="list-disc pl-5 text-sm text-gray-600 space-y-1">
-              <li>
+            <ul className="recommendations-list">
+              <li className="recommendation-item">
                 Water Resistance - 2 out of 3 competitors have this feature
               </li>
-              <li>
+              <li className="recommendation-item">
                 Multi-device Connection - 2 out of 3 competitors have this
                 feature
               </li>
-              <li>Active EQ - 2 out of 3 competitors have this feature</li>
+              <li className="recommendation-item">Active EQ - 2 out of 3 competitors have this feature</li>
             </ul>
           </div>
         </div>
@@ -623,28 +588,28 @@ const ComparisonPage = () => {
 
       {/* Strengths & Weaknesses */}
       {comparisonMode === "strengths" && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="strengths-weaknesses-grid">
           {/* Your Product */}
           <div className="card">
             <h2 className="text-lg font-medium mb-4">Your Product</h2>
             <div className="mb-4">
-              <h3 className="text-sm font-medium text-green-700 mb-2">
+              <h3 className="strengths-section-title strengths-title">
                 Strengths
               </h3>
-              <ul className="list-disc pl-5 text-sm text-gray-600 space-y-1">
+              <ul className="strengths-weaknesses-list">
                 {comparisonData.yourProduct.strengths.map((strength, index) => (
-                  <li key={index}>{strength}</li>
+                  <li key={index} className="strengths-weaknesses-item">{strength}</li>
                 ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-red-700 mb-2">
+              <h3 className="strengths-section-title weaknesses-title">
                 Areas for Improvement
               </h3>
-              <ul className="list-disc pl-5 text-sm text-gray-600 space-y-1">
+              <ul className="strengths-weaknesses-list">
                 {comparisonData.yourProduct.weaknesses.map(
                   (weakness, index) => (
-                    <li key={index}>{weakness}</li>
+                    <li key={index} className="strengths-weaknesses-item">{weakness}</li>
                   )
                 )}
               </ul>
@@ -657,12 +622,12 @@ const ComparisonPage = () => {
               <div key={index} className="card">
                 <h2 className="text-lg font-medium mb-4">{competitor.name}</h2>
                 <div>
-                  <h3 className="text-sm font-medium text-blue-700 mb-2">
+                  <h3 className="strengths-section-title competitor-advantages-title">
                     Competitive Advantages
                   </h3>
-                  <ul className="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                  <ul className="strengths-weaknesses-list">
                     {competitor.strengths.map((strength, i) => (
-                      <li key={i}>{strength}</li>
+                      <li key={i} className="strengths-weaknesses-item">{strength}</li>
                     ))}
                   </ul>
                 </div>
@@ -671,17 +636,17 @@ const ComparisonPage = () => {
           </div>
 
           {/* Recommendations */}
-          <div className="card col-span-1 lg:col-span-2">
+          <div className="card strengths-weaknesses-full-width">
             <h2 className="text-lg font-medium mb-4">
               Strategic Recommendations
             </h2>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="analysis-text">
               Based on competitive analysis, here are key improvements to
               consider:
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="bg-green-50 border border-green-100 p-4 rounded-lg">
-                <h3 className="font-medium text-green-800 mb-2">
+            <div className="recommendations-grid">
+              <div className="recommendation-card">
+                <h3 className="recommendation-card-title">
                   Add Use Case Examples
                 </h3>
                 <p className="text-sm text-gray-600">
@@ -689,8 +654,8 @@ const ComparisonPage = () => {
                   your headphones excel.
                 </p>
               </div>
-              <div className="bg-green-50 border border-green-100 p-4 rounded-lg">
-                <h3 className="font-medium text-green-800 mb-2">
+              <div className="recommendation-card">
+                <h3 className="recommendation-card-title">
                   Include Customer Testimonials
                 </h3>
                 <p className="text-sm text-gray-600">
@@ -698,8 +663,8 @@ const ComparisonPage = () => {
                   demonstrate real-world benefits.
                 </p>
               </div>
-              <div className="bg-green-50 border border-green-100 p-4 rounded-lg">
-                <h3 className="font-medium text-green-800 mb-2">
+              <div className="recommendation-card">
+                <h3 className="recommendation-card-title">
                   Add Compatibility Information
                 </h3>
                 <p className="text-sm text-gray-600">

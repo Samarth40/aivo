@@ -1,0 +1,463 @@
+/* AnalyzePage component styles */
+
+/* Page container */
+.analyze-page {
+  padding: 1.5rem 0;
+}
+
+/* Page heading */
+.analyze-page-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .analyze-page-title {
+    font-size: 1.875rem;
+  }
+}
+
+.analyze-page-description {
+  color: var(--color-gray-600);
+  margin-bottom: 2rem;
+}
+
+/* Tab navigation */
+.analyze-tab-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .analyze-tab-group {
+    flex-direction: row;
+  }
+}
+
+.analyze-tab {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--color-gray-200);
+  cursor: pointer;
+}
+
+.analyze-tab.active {
+  border-color: var(--color-primary);
+  background-color: rgba(79, 70, 229, 0.05);
+}
+
+.analyze-tab-icon {
+  height: 1.25rem;
+  width: 1.25rem;
+  margin-right: 0.5rem;
+  color: var(--color-gray-500);
+}
+
+/* Input container */
+.url-input-container {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.url-input-icon {
+  position: absolute;
+  top: 50%;
+  left: 0.75rem;
+  transform: translateY(-50%);
+  height: 1.25rem;
+  width: 1.25rem;
+  color: var(--color-gray-400);
+  pointer-events: none;
+}
+
+.url-input {
+  padding-left: 2.5rem;
+}
+
+/* Recent items */
+.recent-items-label {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--color-gray-500);
+  margin-bottom: 0.5rem;
+}
+
+.recent-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem;
+  text-align: left;
+  font-size: 0.875rem;
+  border-radius: var(--border-radius-md);
+}
+
+.recent-item:hover {
+  background-color: var(--color-gray-50);
+}
+
+.recent-item-number {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  background-color: var(--color-gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.75rem;
+}
+
+.recent-item-text {
+  color: var(--color-gray-800);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.recent-item-icon {
+  height: 1rem;
+  width: 1rem;
+  color: var(--color-gray-400);
+}
+
+/* File upload area */
+.file-upload-area {
+  border: 2px dashed var(--color-gray-300);
+  border-radius: var(--border-radius-xl);
+  padding: 2.5rem;
+  text-align: center;
+}
+
+.file-upload-icon {
+  height: 3rem;
+  width: 3rem;
+  margin: 0 auto 1rem auto;
+  color: var(--color-gray-400);
+}
+
+.file-upload-text {
+  color: var(--color-gray-600);
+  margin-bottom: 0.5rem;
+}
+
+.file-upload-subtext {
+  color: var(--color-gray-500);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+/* Analysis results */
+.results-header {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+@media (min-width: 640px) {
+  .results-header {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.results-title-container {
+  display: flex;
+  align-items: center;
+}
+
+.results-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-right: 0.75rem;
+}
+
+.results-url {
+  color: var(--color-gray-500);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.results-actions {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+@media (min-width: 640px) {
+  .results-actions {
+    margin-top: 0;
+  }
+}
+
+.action-button-icon {
+  height: 1rem;
+  width: 1rem;
+  margin-right: 0.25rem;
+}
+
+/* Score visualization */
+.score-overview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .score-overview {
+    flex-direction: row;
+  }
+}
+
+.score-circle-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.score-circle-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.score-circle-value {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--color-gray-800);
+}
+
+.score-circle-label {
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--color-gray-500);
+}
+
+.score-details {
+  margin-left: 0;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .score-details {
+    margin-left: 2rem;
+    margin-top: 0;
+  }
+}
+
+.score-details-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.score-details-description {
+  color: var(--color-gray-600);
+  margin-bottom: 1rem;
+}
+
+.score-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.score-badge {
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+}
+
+.score-badge-primary {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.score-badge-success {
+  background-color: var(--color-success-light);
+}
+
+.score-badge-icon {
+  height: 1rem;
+  width: 1rem;
+  margin-right: 0.25rem;
+}
+
+.score-badge-text-primary {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+.score-badge-text-success {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-success-dark);
+}
+
+/* Recommendation cards */
+.recommendation-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .recommendation-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.recommendation-title-container {
+  display: flex;
+  align-items: center;
+}
+
+.recommendation-score {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+}
+
+.recommendation-score-text {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.recommendation-score-good {
+  background-color: var(--color-success-light);
+  color: var(--color-success-dark);
+}
+
+.recommendation-score-moderate {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: rgb(37, 99, 235);
+}
+
+.recommendation-score-fair {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: rgb(217, 119, 6);
+}
+
+.recommendation-score-poor {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: rgb(220, 38, 38);
+}
+
+.recommendation-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.recommendation-progress {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+  .recommendation-progress {
+    width: 12rem;
+    margin-top: 0;
+  }
+}
+
+.recommendation-progress-bg {
+  width: 100%;
+  background-color: var(--color-gray-200);
+  border-radius: 9999px;
+  height: 0.5rem;
+}
+
+.recommendation-progress-bar {
+  height: 0.5rem;
+  border-radius: 9999px;
+}
+
+.recommendation-progress-good {
+  background-color: var(--color-success);
+}
+
+.recommendation-progress-moderate {
+  background-color: rgb(59, 130, 246);
+}
+
+.recommendation-progress-fair {
+  background-color: rgb(245, 158, 11);
+}
+
+.recommendation-progress-poor {
+  background-color: rgb(239, 68, 68);
+}
+
+.recommendation-details {
+  color: var(--color-gray-600);
+  margin-bottom: 1rem;
+}
+
+.recommendation-suggestions {
+  background-color: var(--color-gray-50);
+  padding: 1rem;
+  border-radius: var(--border-radius-lg);
+}
+
+.recommendation-suggestions-title {
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+}
+
+.recommendation-suggestions-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  space-y: 0.5rem;
+}
+
+.recommendation-suggestion-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.recommendation-suggestion-number {
+  height: 1.25rem;
+  width: 1.25rem;
+  border-radius: 9999px;
+  background-color: rgba(79, 70, 229, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  margin-right: 0.5rem;
+}
+
+.recommendation-suggestion-number-text {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+.recommendation-suggestion-text {
+  color: var(--color-gray-700);
+}
+
+/* Final action buttons */
+.final-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}

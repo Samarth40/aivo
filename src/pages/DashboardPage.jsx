@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import '../styles/components/DashboardPage.css';
 import {
   ArrowUpIcon,
   ArrowDownIcon,
@@ -81,12 +82,12 @@ const DashboardPage = () => {
 
   return (
     <div className="py-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+      <div className="dashboard-header">
         <motion.h1
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-2xl sm:text-3xl font-bold gradient-text"
+          className="dashboard-title gradient-text"
         >
           AI Visibility Dashboard
         </motion.h1>
@@ -95,35 +96,35 @@ const DashboardPage = () => {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex items-center space-x-2 mt-4 sm:mt-0"
+          className="dashboard-timeframe"
         >
           <button
             onClick={() => setActiveTimeframe("week")}
-            className={`px-4 py-2 text-sm rounded-lg ${
+            className={`timeframe-button ${
               activeTimeframe === "week"
-                ? "bg-[#4f46e5] text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            } transition-colors`}
+                ? "timeframe-button-active"
+                : "timeframe-button-inactive"
+            }`}
           >
             Week
           </button>
           <button
             onClick={() => setActiveTimeframe("month")}
-            className={`px-4 py-2 text-sm rounded-lg ${
+            className={`timeframe-button ${
               activeTimeframe === "month"
-                ? "bg-[#4f46e5] text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            } transition-colors`}
+                ? "timeframe-button-active"
+                : "timeframe-button-inactive"
+            }`}
           >
             Month
           </button>
           <button
             onClick={() => setActiveTimeframe("quarter")}
-            className={`px-4 py-2 text-sm rounded-lg ${
+            className={`timeframe-button ${
               activeTimeframe === "quarter"
-                ? "bg-[#4f46e5] text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            } transition-colors`}
+                ? "timeframe-button-active"
+                : "timeframe-button-inactive"
+            }`}
           >
             Quarter
           </button>
@@ -135,32 +136,33 @@ const DashboardPage = () => {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+        className="stats-grid"
       >
         {/* AI Visibility Score */}
         <motion.div
           variants={itemVariants}
-          className="stat-card from-[#4f46e5]/10 to-[#818cf8]/20 border border-[#818cf8]/20"
+          className="stat-card"
+          style={{"--from": "rgba(79, 70, 229, 0.1)", "--to": "rgba(129, 140, 248, 0.2)"}}
         >
-          <div className="flex justify-between items-start">
+          <div className="stat-card-header">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="stat-card-title">
                 AI Visibility Score
               </p>
-              <h3 className="text-3xl font-bold mt-1">78/100</h3>
+              <h3 className="stat-card-value">78/100</h3>
             </div>
-            <span className="p-2 bg-[#4f46e5]/10 rounded-lg">
+            <span className="stat-card-icon-container" style={{"backgroundColor": "rgba(79, 70, 229, 0.1)"}}>
               <ChartBarIcon className="h-6 w-6 text-[#4f46e5]" />
             </span>
           </div>
-          <div className="flex items-center mt-4 text-sm">
-            <ArrowUpIcon className="h-4 w-4 text-green-500 mr-1" />
-            <span className="text-green-500 font-medium">+12%</span>
-            <span className="text-gray-500 ml-1">from last month</span>
+          <div className="stat-card-metric">
+            <ArrowUpIcon className="stat-card-metric-icon stat-card-metric-positive" />
+            <span className="stat-card-metric-value stat-card-metric-positive">+12%</span>
+            <span className="stat-card-metric-label">from last month</span>
           </div>
-          <div className="mt-3 w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
+          <div className="progress-bar">
             <div
-              className="bg-[#4f46e5] h-full rounded-full"
+              className="progress-bar-fill bg-[#4f46e5]"
               style={{ width: "78%" }}
             ></div>
           </div>
@@ -169,23 +171,24 @@ const DashboardPage = () => {
         {/* Product Appearances */}
         <motion.div
           variants={itemVariants}
-          className="stat-card from-[#0ea5e9]/10 to-[#38bdf8]/20 border border-[#38bdf8]/20"
+          className="stat-card"
+          style={{"--from": "rgba(14, 165, 233, 0.1)", "--to": "rgba(56, 189, 248, 0.2)"}}
         >
-          <div className="flex justify-between items-start">
+          <div className="stat-card-header">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="stat-card-title">
                 Product Appearances
               </p>
-              <h3 className="text-3xl font-bold mt-1">1,482</h3>
+              <h3 className="stat-card-value">1,482</h3>
             </div>
-            <span className="p-2 bg-[#0ea5e9]/10 rounded-lg">
+            <span className="stat-card-icon-container" style={{"backgroundColor": "rgba(14, 165, 233, 0.1)"}}>
               <EyeIcon className="h-6 w-6 text-[#0ea5e9]" />
             </span>
           </div>
-          <div className="flex items-center mt-4 text-sm">
-            <ArrowUpIcon className="h-4 w-4 text-green-500 mr-1" />
-            <span className="text-green-500 font-medium">+24%</span>
-            <span className="text-gray-500 ml-1">from last month</span>
+          <div className="stat-card-metric">
+            <ArrowUpIcon className="stat-card-metric-icon stat-card-metric-positive" />
+            <span className="stat-card-metric-value stat-card-metric-positive">+24%</span>
+            <span className="stat-card-metric-label">from last month</span>
           </div>
           <div className="mt-3 h-8">
             <div className="flex justify-between text-xs text-gray-500">
@@ -195,9 +198,9 @@ const DashboardPage = () => {
               <span>1500</span>
               <span>2000</span>
             </div>
-            <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mt-1">
+            <div className="progress-bar mt-1">
               <div
-                className="bg-[#0ea5e9] h-full rounded-full"
+                className="progress-bar-fill bg-[#0ea5e9]"
                 style={{ width: "74%" }}
               ></div>
             </div>
@@ -207,23 +210,24 @@ const DashboardPage = () => {
         {/* Optimization Score */}
         <motion.div
           variants={itemVariants}
-          className="stat-card from-[#10b981]/10 to-[#34d399]/20 border border-[#34d399]/20"
+          className="stat-card"
+          style={{"--from": "rgba(16, 185, 129, 0.1)", "--to": "rgba(52, 211, 153, 0.2)"}}
         >
-          <div className="flex justify-between items-start">
+          <div className="stat-card-header">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="stat-card-title">
                 Optimization Score
               </p>
-              <h3 className="text-3xl font-bold mt-1">86%</h3>
+              <h3 className="stat-card-value">86%</h3>
             </div>
-            <span className="p-2 bg-[#10b981]/10 rounded-lg">
+            <span className="stat-card-icon-container" style={{"backgroundColor": "rgba(16, 185, 129, 0.1)"}}>
               <RocketLaunchIcon className="h-6 w-6 text-[#10b981]" />
             </span>
           </div>
-          <div className="flex items-center mt-4 text-sm">
-            <ArrowUpIcon className="h-4 w-4 text-green-500 mr-1" />
-            <span className="text-green-500 font-medium">+8%</span>
-            <span className="text-gray-500 ml-1">from last month</span>
+          <div className="stat-card-metric">
+            <ArrowUpIcon className="stat-card-metric-icon stat-card-metric-positive" />
+            <span className="stat-card-metric-value stat-card-metric-positive">+8%</span>
+            <span className="stat-card-metric-label">from last month</span>
           </div>
           <div className="mt-3">
             <div className="relative pt-1">
@@ -235,10 +239,10 @@ const DashboardPage = () => {
                   </span>
                 </div>
               </div>
-              <div className="flex h-2 overflow-hidden rounded-full bg-gray-200">
+              <div className="progress-bar">
                 <div
+                  className="progress-bar-fill bg-[#10b981]"
                   style={{ width: "86%" }}
-                  className="bg-[#10b981] rounded-full"
                 ></div>
               </div>
             </div>
@@ -248,23 +252,24 @@ const DashboardPage = () => {
         {/* Competitive Rank */}
         <motion.div
           variants={itemVariants}
-          className="stat-card from-[#f59e0b]/10 to-[#fbbf24]/20 border border-[#fbbf24]/20"
+          className="stat-card"
+          style={{"--from": "rgba(245, 158, 11, 0.1)", "--to": "rgba(251, 191, 36, 0.2)"}}
         >
-          <div className="flex justify-between items-start">
+          <div className="stat-card-header">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="stat-card-title">
                 Competitive Rank
               </p>
-              <h3 className="text-3xl font-bold mt-1">#2</h3>
+              <h3 className="stat-card-value">#2</h3>
             </div>
-            <span className="p-2 bg-[#f59e0b]/10 rounded-lg">
+            <span className="stat-card-icon-container" style={{"backgroundColor": "rgba(245, 158, 11, 0.1)"}}>
               <StarIcon className="h-6 w-6 text-[#f59e0b]" />
             </span>
           </div>
-          <div className="flex items-center mt-4 text-sm">
-            <ArrowUpIcon className="h-4 w-4 text-green-500 mr-1" />
-            <span className="text-green-500 font-medium">+1</span>
-            <span className="text-gray-500 ml-1">from last month</span>
+          <div className="stat-card-metric">
+            <ArrowUpIcon className="stat-card-metric-icon stat-card-metric-positive" />
+            <span className="stat-card-metric-value stat-card-metric-positive">+1</span>
+            <span className="stat-card-metric-label">from last month</span>
           </div>
           <div className="mt-3 flex items-center justify-between">
             <div className="flex items-center">
@@ -289,24 +294,24 @@ const DashboardPage = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="card mb-8"
+        className="card chart-card"
       >
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+        <div className="chart-header">
           <div>
-            <h2 className="text-xl font-bold mb-1">AI Visibility Trend</h2>
-            <p className="text-gray-500 text-sm">
+            <h2 className="chart-title">AI Visibility Trend</h2>
+            <p className="chart-description">
               Your product's visibility score over time
             </p>
           </div>
-          <div className="flex items-center space-x-2 mt-4 md:mt-0">
-            <button className="flex items-center text-sm text-[#4f46e5] hover:text-[#3730a3] transition-colors">
-              <ArrowPathIcon className="h-4 w-4 mr-1" />
+          <div className="chart-actions">
+            <button className="chart-action-button">
+              <ArrowPathIcon className="chart-action-icon" />
               <span>Refresh Data</span>
             </button>
           </div>
         </div>
 
-        <div className="h-80">
+        <div className="chart-container">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={visibilityData}
@@ -347,7 +352,7 @@ const DashboardPage = () => {
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="two-column-grid">
         {/* Competitor comparison chart */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -355,12 +360,12 @@ const DashboardPage = () => {
           transition={{ delay: 0.5 }}
           className="card"
         >
-          <h2 className="text-xl font-bold mb-1">Competitor Comparison</h2>
-          <p className="text-gray-500 text-sm mb-6">
+          <h2 className="chart-title">Competitor Comparison</h2>
+          <p className="chart-description">
             How your products compare to competitors
           </p>
 
-          <div className="h-80">
+          <div className="chart-container">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={comparativeData}
@@ -413,75 +418,75 @@ const DashboardPage = () => {
           transition={{ delay: 0.6 }}
           className="card"
         >
-          <h2 className="text-xl font-bold mb-1">Improvement Opportunities</h2>
-          <p className="text-gray-500 text-sm mb-6">Top areas to focus on</p>
+          <h2 className="chart-title">Improvement Opportunities</h2>
+          <p className="chart-description">Top areas to focus on</p>
 
           <div className="space-y-6">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center">
-                  <span className="w-3 h-3 bg-[#ef4444] rounded-full mr-2"></span>
-                  <span className="text-sm font-medium">
+            <div className="improvement-item">
+              <div className="improvement-header">
+                <div className="improvement-label">
+                  <span className="improvement-indicator" style={{ backgroundColor: "#ef4444" }}></span>
+                  <span className="improvement-title">
                     Product Descriptions
                   </span>
                 </div>
-                <span className="text-sm font-medium">65%</span>
+                <span className="improvement-score">65%</span>
               </div>
-              <div className="h-2 bg-gray-200 rounded-full">
+              <div className="improvement-bar">
                 <div
-                  className="h-full bg-[#ef4444] rounded-full"
-                  style={{ width: "65%" }}
+                  className="improvement-bar-fill"
+                  style={{ width: "65%", backgroundColor: "#ef4444" }}
                 ></div>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="improvement-description">
                 Your product descriptions need more specific use cases and
                 problem-solving language.
               </p>
             </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center">
-                  <span className="w-3 h-3 bg-[#f59e0b] rounded-full mr-2"></span>
-                  <span className="text-sm font-medium">Feature Highlight</span>
+            <div className="improvement-item">
+              <div className="improvement-header">
+                <div className="improvement-label">
+                  <span className="improvement-indicator" style={{ backgroundColor: "#f59e0b" }}></span>
+                  <span className="improvement-title">Feature Highlight</span>
                 </div>
-                <span className="text-sm font-medium">72%</span>
+                <span className="improvement-score">72%</span>
               </div>
-              <div className="h-2 bg-gray-200 rounded-full">
+              <div className="improvement-bar">
                 <div
-                  className="h-full bg-[#f59e0b] rounded-full"
-                  style={{ width: "72%" }}
+                  className="improvement-bar-fill"
+                  style={{ width: "72%", backgroundColor: "#f59e0b" }}
                 ></div>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="improvement-description">
                 Key features need to be described in terms of benefits rather
                 than specifications.
               </p>
             </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center">
-                  <span className="w-3 h-3 bg-[#10b981] rounded-full mr-2"></span>
-                  <span className="text-sm font-medium">
+            <div className="improvement-item">
+              <div className="improvement-header">
+                <div className="improvement-label">
+                  <span className="improvement-indicator" style={{ backgroundColor: "#10b981" }}></span>
+                  <span className="improvement-title">
                     Contextual Relationships
                   </span>
                 </div>
-                <span className="text-sm font-medium">84%</span>
+                <span className="improvement-score">84%</span>
               </div>
-              <div className="h-2 bg-gray-200 rounded-full">
+              <div className="improvement-bar">
                 <div
-                  className="h-full bg-[#10b981] rounded-full"
-                  style={{ width: "84%" }}
+                  className="improvement-bar-fill"
+                  style={{ width: "84%", backgroundColor: "#10b981" }}
                 ></div>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="improvement-description">
                 Strong connection between product and related use cases. Minor
                 improvements possible.
               </p>
             </div>
 
-            <div className="flex justify-center mt-8">
+            <div className="improvement-actions">
               <button className="btn btn-primary flex items-center">
                 <MagnifyingGlassIcon className="h-5 w-5 mr-2" />
                 Run Detailed Analysis
