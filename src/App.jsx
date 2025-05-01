@@ -20,6 +20,8 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import FeaturesPage from "./pages/FeaturesPage";
 import PricingPage from "./pages/PricingPage";
 import IntegrationsPage from "./pages/IntegrationsPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import LoadingPage from "./pages/LoadingPage";
 
 const App = () => {
   return (
@@ -34,6 +36,7 @@ const App = () => {
             <Route path="features" element={<FeaturesPage />} />
             <Route path="pricing" element={<PricingPage />} />
             <Route path="integrations" element={<IntegrationsPage />} />
+            <Route path="loading" element={<LoadingPage />} />
           </Route>
 
           {/* Auth routes */}
@@ -49,6 +52,9 @@ const App = () => {
             <Route path="reports" element={<ReportsPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
+
+          {/* 404 Not Found - must be last */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>
     </ThemeProvider>
