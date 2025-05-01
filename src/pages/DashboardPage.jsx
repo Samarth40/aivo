@@ -141,8 +141,7 @@ const DashboardPage = () => {
         {/* AI Visibility Score */}
         <motion.div
           variants={itemVariants}
-          className="stat-card"
-          style={{"--from": "rgba(79, 70, 229, 0.1)", "--to": "rgba(129, 140, 248, 0.2)"}}
+          className="stat-card stat-card-primary"
         >
           <div className="stat-card-header">
             <div>
@@ -151,7 +150,7 @@ const DashboardPage = () => {
               </p>
               <h3 className="stat-card-value">78/100</h3>
             </div>
-            <span className="stat-card-icon-container" style={{"backgroundColor": "rgba(79, 70, 229, 0.1)"}}>
+            <span className="stat-card-icon-container icon-container-primary">
               <ChartBarIcon className="h-6 w-6 text-[#4f46e5]" />
             </span>
           </div>
@@ -162,7 +161,7 @@ const DashboardPage = () => {
           </div>
           <div className="progress-bar">
             <div
-              className="progress-bar-fill bg-[#4f46e5]"
+              className="progress-bar-fill progress-fill-primary"
               style={{ width: "78%" }}
             ></div>
           </div>
@@ -171,8 +170,7 @@ const DashboardPage = () => {
         {/* Product Appearances */}
         <motion.div
           variants={itemVariants}
-          className="stat-card"
-          style={{"--from": "rgba(14, 165, 233, 0.1)", "--to": "rgba(56, 189, 248, 0.2)"}}
+          className="stat-card stat-card-blue"
         >
           <div className="stat-card-header">
             <div>
@@ -181,7 +179,7 @@ const DashboardPage = () => {
               </p>
               <h3 className="stat-card-value">1,482</h3>
             </div>
-            <span className="stat-card-icon-container" style={{"backgroundColor": "rgba(14, 165, 233, 0.1)"}}>
+            <span className="stat-card-icon-container icon-container-blue">
               <EyeIcon className="h-6 w-6 text-[#0ea5e9]" />
             </span>
           </div>
@@ -200,7 +198,7 @@ const DashboardPage = () => {
             </div>
             <div className="progress-bar mt-1">
               <div
-                className="progress-bar-fill bg-[#0ea5e9]"
+                className="progress-bar-fill progress-fill-blue"
                 style={{ width: "74%" }}
               ></div>
             </div>
@@ -210,8 +208,7 @@ const DashboardPage = () => {
         {/* Optimization Score */}
         <motion.div
           variants={itemVariants}
-          className="stat-card"
-          style={{"--from": "rgba(16, 185, 129, 0.1)", "--to": "rgba(52, 211, 153, 0.2)"}}
+          className="stat-card stat-card-green"
         >
           <div className="stat-card-header">
             <div>
@@ -220,7 +217,7 @@ const DashboardPage = () => {
               </p>
               <h3 className="stat-card-value">86%</h3>
             </div>
-            <span className="stat-card-icon-container" style={{"backgroundColor": "rgba(16, 185, 129, 0.1)"}}>
+            <span className="stat-card-icon-container icon-container-green">
               <RocketLaunchIcon className="h-6 w-6 text-[#10b981]" />
             </span>
           </div>
@@ -241,7 +238,7 @@ const DashboardPage = () => {
               </div>
               <div className="progress-bar">
                 <div
-                  className="progress-bar-fill bg-[#10b981]"
+                  className="progress-bar-fill progress-fill-green"
                   style={{ width: "86%" }}
                 ></div>
               </div>
@@ -252,8 +249,7 @@ const DashboardPage = () => {
         {/* Competitive Rank */}
         <motion.div
           variants={itemVariants}
-          className="stat-card"
-          style={{"--from": "rgba(245, 158, 11, 0.1)", "--to": "rgba(251, 191, 36, 0.2)"}}
+          className="stat-card stat-card-yellow"
         >
           <div className="stat-card-header">
             <div>
@@ -262,7 +258,7 @@ const DashboardPage = () => {
               </p>
               <h3 className="stat-card-value">#2</h3>
             </div>
-            <span className="stat-card-icon-container" style={{"backgroundColor": "rgba(245, 158, 11, 0.1)"}}>
+            <span className="stat-card-icon-container icon-container-yellow">
               <StarIcon className="h-6 w-6 text-[#f59e0b]" />
             </span>
           </div>
@@ -425,7 +421,7 @@ const DashboardPage = () => {
             <div className="improvement-item">
               <div className="improvement-header">
                 <div className="improvement-label">
-                  <span className="improvement-indicator" style={{ backgroundColor: "#ef4444" }}></span>
+                  <span className="improvement-indicator indicator-red"></span>
                   <span className="improvement-title">
                     Product Descriptions
                   </span>
@@ -434,8 +430,8 @@ const DashboardPage = () => {
               </div>
               <div className="improvement-bar">
                 <div
-                  className="improvement-bar-fill"
-                  style={{ width: "65%", backgroundColor: "#ef4444" }}
+                  className="improvement-bar-fill progress-fill-red"
+                  style={{ width: "65%" }}
                 ></div>
               </div>
               <p className="improvement-description">
@@ -447,15 +443,15 @@ const DashboardPage = () => {
             <div className="improvement-item">
               <div className="improvement-header">
                 <div className="improvement-label">
-                  <span className="improvement-indicator" style={{ backgroundColor: "#f59e0b" }}></span>
+                  <span className="improvement-indicator indicator-yellow"></span>
                   <span className="improvement-title">Feature Highlight</span>
                 </div>
                 <span className="improvement-score">72%</span>
               </div>
               <div className="improvement-bar">
                 <div
-                  className="improvement-bar-fill"
-                  style={{ width: "72%", backgroundColor: "#f59e0b" }}
+                  className="improvement-bar-fill progress-fill-yellow"
+                  style={{ width: "72%" }}
                 ></div>
               </div>
               <p className="improvement-description">
@@ -467,7 +463,7 @@ const DashboardPage = () => {
             <div className="improvement-item">
               <div className="improvement-header">
                 <div className="improvement-label">
-                  <span className="improvement-indicator" style={{ backgroundColor: "#10b981" }}></span>
+                  <span className="improvement-indicator indicator-green"></span>
                   <span className="improvement-title">
                     Contextual Relationships
                   </span>
@@ -476,8 +472,8 @@ const DashboardPage = () => {
               </div>
               <div className="improvement-bar">
                 <div
-                  className="improvement-bar-fill"
-                  style={{ width: "84%", backgroundColor: "#10b981" }}
+                  className="improvement-bar-fill progress-fill-green"
+                  style={{ width: "84%" }}
                 ></div>
               </div>
               <p className="improvement-description">
