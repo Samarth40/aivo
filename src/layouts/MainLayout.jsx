@@ -5,12 +5,16 @@ import {
   Bars3Icon,
   XMarkIcon,
   ChevronRightIcon,
+  SunIcon,
+  MoonIcon,
 } from "@heroicons/react/24/outline";
+import { useTheme } from "../context/ThemeContext";
 
 const MainLayout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const { isDarkMode, toggleTheme } = useTheme();
 
   // Handle scroll effect for navbar
   useEffect(() => {
@@ -29,18 +33,26 @@ const MainLayout = () => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className={`flex flex-col min-h-screen ${isDarkMode ? "bg-gray-900" : ""}`}>
       {/* Navigation Header */}
       <header
         className={`fixed w-full z-50 transition-all duration-300 ${
-          scrolled ? "bg-white shadow-md py-2" : "bg-transparent py-4"
+          scrolled
+            ? isDarkMode
+              ? "bg-gray-800 shadow-md shadow-gray-900 py-2"
+              : "bg-white shadow-md py-2"
+            : "bg-transparent py-4"
         }`}
       >
         <div className="container mx-auto px-4 flex justify-between items-center">
           <Link
             to="/"
             className={`text-2xl font-bold transition-colors ${
-              scrolled ? "text-[#4f46e5]" : "text-white"
+              scrolled
+                ? "text-[#4f46e5]"
+                : isDarkMode
+                ? "text-white"
+                : "text-white"
             }`}
           >
             <motion.div
@@ -64,7 +76,9 @@ const MainLayout = () => {
                 location.pathname === "/"
                   ? "text-[#4f46e5] font-medium"
                   : scrolled
-                  ? "text-gray-700 hover:text-[#4f46e5]"
+                  ? isDarkMode
+                    ? "text-gray-300 hover:text-[#818cf8]"
+                    : "text-gray-700 hover:text-[#4f46e5]"
                   : "text-white hover:text-white/80"
               } transition-colors`}
             >
@@ -76,7 +90,9 @@ const MainLayout = () => {
                 location.pathname === "/features"
                   ? "text-[#4f46e5] font-medium"
                   : scrolled
-                  ? "text-gray-700 hover:text-[#4f46e5]"
+                  ? isDarkMode
+                    ? "text-gray-300 hover:text-[#818cf8]"
+                    : "text-gray-700 hover:text-[#4f46e5]"
                   : "text-white hover:text-white/80"
               } transition-colors`}
             >
@@ -88,17 +104,37 @@ const MainLayout = () => {
                 location.pathname === "/pricing"
                   ? "text-[#4f46e5] font-medium"
                   : scrolled
-                  ? "text-gray-700 hover:text-[#4f46e5]"
+                  ? isDarkMode
+                    ? "text-gray-300 hover:text-[#818cf8]"
+                    : "text-gray-700 hover:text-[#4f46e5]"
                   : "text-white hover:text-white/80"
               } transition-colors`}
             >
               Pricing
             </Link>
+
+            {/* Theme toggle button */}
+            <button
+              onClick={toggleTheme}
+              className="theme-toggle"
+              aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {isDarkMode ? (
+                <SunIcon className="h-5 w-5 text-yellow-400 theme-toggle-icon" />
+              ) : (
+                <MoonIcon className="h-5 w-5 text-gray-600 theme-toggle-icon" />
+              )}
+            </button>
+
             <div className="flex items-center space-x-4">
               <Link
                 to="/login"
                 className={`btn ${
-                  scrolled ? "btn-secondary" : "glass text-white"
+                  scrolled
+                    ? isDarkMode
+                      ? "btn-secondary bg-gray-700 hover:bg-gray-600"
+                      : "btn-secondary"
+                    : "glass text-white"
                 }`}
               >
                 Login
@@ -119,7 +155,11 @@ const MainLayout = () => {
             ) : (
               <Bars3Icon
                 className={`h-6 w-6 ${
-                  scrolled ? "text-gray-800" : "text-white"
+                  scrolled
+                    ? isDarkMode
+                      ? "text-gray-200"
+                      : "text-gray-800"
+                    : "text-white"
                 }`}
               />
             )}
@@ -133,34 +173,73 @@ const MainLayout = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="absolute top-full left-0 right-0 bg-white shadow-lg z-20 md:hidden"
+            className={`absolute top-full left-0 right-0 ${
+              isDarkMode ? "bg-gray-800" : "bg-white"
+            } shadow-lg z-20 md:hidden`}
           >
             <div className="px-4 py-2 space-y-1">
               <Link
                 to="/"
-                className="block p-3 rounded-lg hover:bg-gray-100"
+                className={`block p-3 rounded-lg ${
+                  isDarkMode
+                    ? "hover:bg-gray-700 text-gray-200"
+                    : "hover:bg-gray-100 text-gray-800"
+                }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Home
               </Link>
               <Link
                 to="/features"
-                className="block p-3 rounded-lg hover:bg-gray-100"
+                className={`block p-3 rounded-lg ${
+                  isDarkMode
+                    ? "hover:bg-gray-700 text-gray-200"
+                    : "hover:bg-gray-100 text-gray-800"
+                }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Features
               </Link>
               <Link
                 to="/pricing"
-                className="block p-3 rounded-lg hover:bg-gray-100"
+                className={`block p-3 rounded-lg ${
+                  isDarkMode
+                    ? "hover:bg-gray-700 text-gray-200"
+                    : "hover:bg-gray-100 text-gray-800"
+                }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Pricing
               </Link>
+
+              {/* Theme toggle in mobile menu */}
+              <div
+                className={`p-3 rounded-lg ${
+                  isDarkMode ? "text-gray-200" : "text-gray-800"
+                } flex justify-between items-center`}
+              >
+                <span>Theme</span>
+                <button
+                  onClick={toggleTheme}
+                  className="theme-toggle p-2"
+                  aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                >
+                  {isDarkMode ? (
+                    <SunIcon className="h-5 w-5 text-yellow-400" />
+                  ) : (
+                    <MoonIcon className="h-5 w-5 text-gray-600" />
+                  )}
+                </button>
+              </div>
+
               <div className="flex flex-col space-y-2 pt-2 pb-3">
                 <Link
                   to="/login"
-                  className="btn btn-secondary w-full text-center"
+                  className={`btn ${
+                    isDarkMode
+                      ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
+                      : "btn-secondary"
+                  } w-full text-center`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Login
@@ -179,12 +258,22 @@ const MainLayout = () => {
       </header>
 
       {/* Main Content with top padding for fixed header */}
-      <main className="flex-grow pt-16">
+      <main
+        className={`flex-grow pt-16 ${
+          isDarkMode ? "bg-gray-900 text-gray-100" : ""
+        }`}
+      >
         <Outlet />
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer
+        className={
+          isDarkMode
+            ? "bg-gray-900 text-white py-12 border-t border-gray-800"
+            : "bg-gray-900 text-white py-12"
+        }
+      >
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-1">

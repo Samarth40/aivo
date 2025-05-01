@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import '../styles/components/DashboardPage.css';
+import "../styles/components/DashboardPage.css";
 import {
   ArrowUpIcon,
   ArrowDownIcon,
@@ -145,9 +145,7 @@ const DashboardPage = () => {
         >
           <div className="stat-card-header">
             <div>
-              <p className="stat-card-title">
-                AI Visibility Score
-              </p>
+              <p className="stat-card-title">AI Visibility Score</p>
               <h3 className="stat-card-value">78/100</h3>
             </div>
             <span className="stat-card-icon-container icon-container-primary">
@@ -156,7 +154,9 @@ const DashboardPage = () => {
           </div>
           <div className="stat-card-metric">
             <ArrowUpIcon className="stat-card-metric-icon stat-card-metric-positive" />
-            <span className="stat-card-metric-value stat-card-metric-positive">+12%</span>
+            <span className="stat-card-metric-value stat-card-metric-positive">
+              +12%
+            </span>
             <span className="stat-card-metric-label">from last month</span>
           </div>
           <div className="progress-bar">
@@ -174,9 +174,7 @@ const DashboardPage = () => {
         >
           <div className="stat-card-header">
             <div>
-              <p className="stat-card-title">
-                Product Appearances
-              </p>
+              <p className="stat-card-title">Product Appearances</p>
               <h3 className="stat-card-value">1,482</h3>
             </div>
             <span className="stat-card-icon-container icon-container-blue">
@@ -185,7 +183,9 @@ const DashboardPage = () => {
           </div>
           <div className="stat-card-metric">
             <ArrowUpIcon className="stat-card-metric-icon stat-card-metric-positive" />
-            <span className="stat-card-metric-value stat-card-metric-positive">+24%</span>
+            <span className="stat-card-metric-value stat-card-metric-positive">
+              +24%
+            </span>
             <span className="stat-card-metric-label">from last month</span>
           </div>
           <div className="mt-3 h-8">
@@ -212,9 +212,7 @@ const DashboardPage = () => {
         >
           <div className="stat-card-header">
             <div>
-              <p className="stat-card-title">
-                Optimization Score
-              </p>
+              <p className="stat-card-title">Optimization Score</p>
               <h3 className="stat-card-value">86%</h3>
             </div>
             <span className="stat-card-icon-container icon-container-green">
@@ -223,7 +221,9 @@ const DashboardPage = () => {
           </div>
           <div className="stat-card-metric">
             <ArrowUpIcon className="stat-card-metric-icon stat-card-metric-positive" />
-            <span className="stat-card-metric-value stat-card-metric-positive">+8%</span>
+            <span className="stat-card-metric-value stat-card-metric-positive">
+              +8%
+            </span>
             <span className="stat-card-metric-label">from last month</span>
           </div>
           <div className="mt-3">
@@ -253,9 +253,7 @@ const DashboardPage = () => {
         >
           <div className="stat-card-header">
             <div>
-              <p className="stat-card-title">
-                Competitive Rank
-              </p>
+              <p className="stat-card-title">Competitive Rank</p>
               <h3 className="stat-card-value">#2</h3>
             </div>
             <span className="stat-card-icon-container icon-container-yellow">
@@ -264,7 +262,9 @@ const DashboardPage = () => {
           </div>
           <div className="stat-card-metric">
             <ArrowUpIcon className="stat-card-metric-icon stat-card-metric-positive" />
-            <span className="stat-card-metric-value stat-card-metric-positive">+1</span>
+            <span className="stat-card-metric-value stat-card-metric-positive">
+              +1
+            </span>
             <span className="stat-card-metric-label">from last month</span>
           </div>
           <div className="mt-3 flex items-center justify-between">

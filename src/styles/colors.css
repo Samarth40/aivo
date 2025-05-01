@@ -83,10 +83,36 @@
   --spacing-xl: 2rem;
   --spacing-xxl: 3rem;
 
-  /* Dark mode - these can be used with a .dark-mode class or media query */
-  --dark-color-text-primary: #e2e8f0;
-  --dark-color-text-secondary: #94a3b8;
-  --dark-color-background: #0f172a;
-  --dark-color-white: #1e293b;
-  --dark-color-border: #334155;
+  /* Transition timings for theme switching */
+  --transition-speed-fast: 0.15s;
+  --transition-speed-normal: 0.3s;
+  --transition-speed-slow: 0.5s;
+}
+
+/* Dark mode class - applied to :root when dark mode is active */
+.dark-mode {
+  /* Flip colors for dark mode */
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #d1d5db;
+  --color-background: #111827;
+  --color-white: #1f2937;
+  --color-border: #374151;
+  
+  /* Adjust component colors for dark mode */
+  --color-card-background: #1f2937;
+  --color-sidebar-from: #0f172a;
+  --color-sidebar-to: #0c0f17;
+  
+  /* Slightly dimmed button colors for dark mode */
+  --color-button-secondary-bg: #1e40af;
+  
+  /* Adjusted input colors */
+  --color-input-border: #4b5563;
+
+  /* Dark mode shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 
+    0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4),
+    0 4px 6px -2px rgba(0, 0, 0, 0.2);
 }

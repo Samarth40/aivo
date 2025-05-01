@@ -5,15 +5,15 @@
   --primary-gradient-from: rgba(79, 70, 229, 0.1);
   --primary-gradient-to: rgba(129, 140, 248, 0.2);
   --primary-icon-bg: rgba(79, 70, 229, 0.1);
-  
+
   --blue-gradient-from: rgba(14, 165, 233, 0.1);
   --blue-gradient-to: rgba(56, 189, 248, 0.2);
   --blue-icon-bg: rgba(14, 165, 233, 0.1);
-  
+
   --green-gradient-from: rgba(16, 185, 129, 0.1);
   --green-gradient-to: rgba(52, 211, 153, 0.2);
   --green-icon-bg: rgba(16, 185, 129, 0.1);
-  
+
   --yellow-gradient-from: rgba(245, 158, 11, 0.1);
   --yellow-gradient-to: rgba(251, 191, 36, 0.2);
   --yellow-icon-bg: rgba(245, 158, 11, 0.1);
@@ -103,7 +103,8 @@
   background-image: linear-gradient(to bottom right, var(--from), var(--to));
   border-radius: 0.75rem;
   padding: 1.25rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .stat-card-primary {

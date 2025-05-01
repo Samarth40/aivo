@@ -1,7 +1,10 @@
 import React, { useState } from "react";
+import { useTheme } from "../context/ThemeContext";
+import { SunIcon, MoonIcon, ComputerDesktopIcon } from "@heroicons/react/24/outline";
 
 const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState("profile");
+  const { isDarkMode, toggleTheme } = useTheme();
 
   // Mock user data
   const userData = {
@@ -124,6 +127,7 @@ const SettingsPage = () => {
 
   const tabs = [
     { id: "profile", label: "Profile" },
+    { id: "appearance", label: "Appearance" },
     { id: "subscription", label: "Subscription" },
     { id: "integrations", label: "Integrations" },
     { id: "api", label: "API & Webhooks" },
@@ -268,6 +272,96 @@ const SettingsPage = () => {
           <button className="btn bg-red-600 text-white hover:bg-red-700">
             Delete Account
           </button>
+        </div>
+      )}
+
+      {/* Appearance Settings */}
+      {activeTab === "appearance" && (
+        <div className="card">
+          <h2 className="text-lg font-medium mb-6">UI Appearance</h2>
+          <p className="text-gray-600 mb-6">
+            Customize the look and feel of the AIVO platform to your preference.
+          </p>
+
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-md font-medium mb-6">Theme</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div 
+                  className={`theme-option border rounded-lg p-6 cursor-pointer hover:border-primary ${!isDarkMode ? 'border-primary bg-blue-50' : 'border-gray-200'}`}
+                  onClick={() => isDarkMode && toggleTheme()}
+                >
+                  <div className="flex justify-center mb-4">
+                    <SunIcon className="h-12 w-12 text-amber-500" />
+                  </div>
+                  <h4 className="font-medium text-center">Light Mode</h4>
+                  <p className="text-sm text-gray-600 text-center mt-2">
+                    Classic light interface
+                  </p>
+                </div>
+                
+                <div 
+                  className={`theme-option border rounded-lg p-6 cursor-pointer hover:border-primary ${isDarkMode ? 'border-primary bg-gray-700' : 'border-gray-200'}`}
+                  onClick={() => !isDarkMode && toggleTheme()}
+                >
+                  <div className="flex justify-center mb-4">
+                    <MoonIcon className="h-12 w-12 text-indigo-300" />
+                  </div>
+                  <h4 className={`font-medium text-center ${isDarkMode ? 'text-gray-100' : ''}`}>Dark Mode</h4>
+                  <p className={`text-sm text-center mt-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    Reduced eye strain in low-light
+                  </p>
+                </div>
+                
+                <div className="theme-option border border-gray-200 rounded-lg p-6 cursor-not-allowed opacity-60">
+                  <div className="flex justify-center mb-4">
+                    <ComputerDesktopIcon className="h-12 w-12 text-gray-400" />
+                  </div>
+                  <h4 className="font-medium text-center">System Default</h4>
+                  <p className="text-sm text-gray-600 text-center mt-2">
+                    Coming soon
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="border-t pt-6">
+              <h3 className="text-md font-medium mb-4">Interface Density</h3>
+              <div className="flex flex-wrap gap-4">
+                <button className="px-4 py-2 bg-blue-50 text-primary border border-primary rounded-md">
+                  Default
+                </button>
+                <button className="px-4 py-2 bg-gray-50 text-gray-500 border border-gray-200 rounded-md">
+                  Compact
+                </button>
+                <button className="px-4 py-2 bg-gray-50 text-gray-500 border border-gray-200 rounded-md">
+                  Comfortable
+                </button>
+              </div>
+              <p className="text-sm text-gray-500 mt-2">
+                Adjust the spacing and density of UI elements.
+              </p>
+            </div>
+            
+            <div className="border-t pt-6">
+              <h3 className="text-md font-medium mb-4">Accent Color</h3>
+              <div className="flex flex-wrap gap-4">
+                <button className="w-10 h-10 rounded-full bg-[#4f46e5] ring-2 ring-offset-2 ring-[#4f46e5]"></button>
+                <button className="w-10 h-10 rounded-full bg-blue-500"></button>
+                <button className="w-10 h-10 rounded-full bg-teal-500"></button>
+                <button className="w-10 h-10 rounded-full bg-amber-500"></button>
+                <button className="w-10 h-10 rounded-full bg-pink-500"></button>
+                <button className="w-10 h-10 rounded-full bg-red-500"></button>
+              </div>
+              <p className="text-sm text-gray-500 mt-2">
+                Coming soon: Customize the accent color of the interface.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-8 pt-4 flex justify-end">
+            <button className="btn btn-primary">Save Preferences</button>
+          </div>
         </div>
       )}
 

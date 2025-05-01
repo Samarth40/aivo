@@ -8,6 +8,9 @@ body {
   background-color: var(--color-background);
   margin: 0;
   padding: 0;
+  /* Add smooth transition for theme change */
+  transition: background-color var(--transition-speed-normal) ease-in-out, 
+              color var(--transition-speed-normal) ease-in-out;
 }
 
 h1,
@@ -46,6 +49,15 @@ a {
 
 a:hover {
   color: var(--color-primary-dark);
+}
+
+/* Add transitions for common elements to ensure smooth theme switching */
+a, button, input, select, textarea, .card, .btn, .badge,
+h1, h2, h3, h4, h5, h6, p, span, div {
+  transition: background-color var(--transition-speed-normal) ease-in-out,
+              color var(--transition-speed-normal) ease-in-out,
+              border-color var(--transition-speed-normal) ease-in-out,
+              box-shadow var(--transition-speed-normal) ease-in-out;
 }
 
 /* Button styles */
@@ -114,6 +126,7 @@ a:hover {
   box-shadow: var(--shadow-md);
   padding: 1.5rem;
   transition: all 0.3s ease;
+  border: 1px solid var(--color-border);
 }
 
 .card:hover {
@@ -122,6 +135,25 @@ a:hover {
 
 .card-hover:hover {
   transform: translateY(-4px);
+}
+
+/* Theme toggle button */
+.theme-toggle {
+  cursor: pointer;
+  border-radius: var(--border-radius-full);
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border: none;
+  transition: all var(--transition-speed-normal) ease;
+}
+
+.theme-toggle:hover {
+  background-color: rgba(var(--color-primary), 0.1);
+  transform: rotate(15deg);
 }
 
 /* Form element styles */
@@ -207,6 +239,38 @@ textarea:focus,
   color: transparent;
 }
 
+/* Dark mode specific overrides */
+.dark-mode .btn-secondary {
+  background-color: var(--color-button-secondary-bg);
+}
+
+.dark-mode .card {
+  border-color: var(--color-border);
+}
+
+.dark-mode .gradient-text {
+  opacity: 0.9;
+}
+
+/* Modern Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-gray-500);
+  border-radius: var(--border-radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-gray-600);
+}
+
 /* Animation classes */
 .animate-fade-in {
   animation: fadeIn 0.5s ease-in-out;
@@ -249,4 +313,18 @@ textarea:focus,
   50% {
     opacity: 0.7;
   }
+}
+
+/* Animation for theme toggle */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.theme-toggle-icon {
+  animation: spin 0.5s ease-in-out;
 }

@@ -13,12 +13,16 @@ import {
   ArrowLeftCircleIcon,
   ArrowRightCircleIcon,
   UserCircleIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  SunIcon,
+  MoonIcon
 } from "@heroicons/react/24/outline";
+import { useTheme } from "../context/ThemeContext";
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const location = useLocation();
+  const { isDarkMode, toggleTheme } = useTheme();
 
   const navItems = [
     { name: "Dashboard", path: "/dashboard", icon: ChartBarIcon },
@@ -43,14 +47,14 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className={`flex h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Animated Sidebar */}
       <motion.aside
         initial={sidebarOpen ? "open" : "closed"}
         animate={sidebarOpen ? "open" : "closed"}
         variants={sidebarVariants}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="bg-gradient-to-b from-[#1f2937] to-[#111827] text-white flex flex-col shadow-lg z-20"
+        className="bg-gradient-to-b from-[var(--color-sidebar-from)] to-[var(--color-sidebar-to)] text-white flex flex-col shadow-lg z-20"
       >
         <div className="p-4 flex items-center justify-between">
           {sidebarOpen ? (
@@ -132,37 +136,50 @@ const DashboardLayout = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-white shadow-sm z-10">
+        <header className={`${isDarkMode ? 'bg-gray-800 shadow-md shadow-gray-900' : 'bg-white shadow-sm'} z-10`}>
           <div className="px-6 py-4 flex justify-between items-center">
             <motion.h2 
               key={location.pathname}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="text-xl font-semibold text-gray-800"
+              className={`text-xl font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}
             >
               {navItems.find((item) => isActive(item.path))?.name ||
                 "Dashboard"}
             </motion.h2>
             <div className="flex items-center space-x-4">
+              {/* Theme Toggle Button */}
+              <button 
+                onClick={toggleTheme}
+                className="theme-toggle"
+                aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {isDarkMode ? (
+                  <SunIcon className="h-5 w-5 text-yellow-400 theme-toggle-icon" />
+                ) : (
+                  <MoonIcon className="h-5 w-5 text-gray-600 theme-toggle-icon" />
+                )}
+              </button>
+              
               <div className="relative">
-                <button className="p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
+                <button className={`p-2 rounded-full ${isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'} transition-colors`}>
                   <BellIcon className="h-5 w-5" />
                 </button>
-                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-[#ef4444] text-xs text-white flex items-center justify-center border-2 border-white">3</span>
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-[#ef4444] text-xs text-white flex items-center justify-center border-2 border-white dark:border-gray-800">3</span>
               </div>
-              <button className="p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
+              <button className={`p-2 rounded-full ${isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'} transition-colors`}>
                 <QuestionMarkCircleIcon className="h-5 w-5" />
               </button>
-              <div className="h-8 border-l border-gray-300"></div>
+              <div className={`h-8 border-l ${isDarkMode ? 'border-gray-700' : 'border-gray-300'}`}></div>
               <div className="flex items-center">
-                <span className="text-sm font-medium text-gray-700 mr-4">AIVO Pro</span>
+                <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mr-4`}>AIVO Pro</span>
                 <span className="badge badge-primary">Beta</span>
               </div>
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
+        <main className={`flex-1 overflow-y-auto p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
           <div className="container mx-auto">
             <motion.div
               initial={{ opacity: 0 }}
