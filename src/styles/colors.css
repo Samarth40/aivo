@@ -97,21 +97,21 @@
   --color-background: #111827;
   --color-white: #1f2937;
   --color-border: #374151;
-  
+
   /* Adjust component colors for dark mode */
   --color-card-background: #1f2937;
   --color-sidebar-from: #0f172a;
   --color-sidebar-to: #0c0f17;
-  
+
   /* Slightly dimmed button colors for dark mode */
   --color-button-secondary-bg: #1e40af;
-  
+
   /* Adjusted input colors */
   --color-input-border: #4b5563;
 
   /* Dark mode shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3),
     0 2px 4px -1px rgba(0, 0, 0, 0.2);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4),
     0 4px 6px -2px rgba(0, 0, 0, 0.2);

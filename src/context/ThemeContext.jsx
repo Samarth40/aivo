@@ -1,36 +1,21 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect } from "react";
 
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  // Check if user has a theme preference saved in localStorage
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const savedTheme = localStorage.getItem('aivo-theme');
-    // Return the saved theme or check user's system preference
-    return savedTheme 
-      ? savedTheme === 'dark'
-      : window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
+  // Always use dark mode
+  const isDarkMode = true;
 
-  // Apply theme class when theme changes
+  // Apply dark theme class when the component mounts
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark-mode');
-    } else {
-      document.documentElement.classList.remove('dark-mode');
-    }
-    
-    // Save theme preference to localStorage
-    localStorage.setItem('aivo-theme', isDarkMode ? 'dark' : 'light');
-  }, [isDarkMode]);
+    document.documentElement.classList.add("dark-mode");
 
-  // Toggle theme function
-  const toggleTheme = () => {
-    setIsDarkMode(prev => !prev);
-  };
+    // Save theme preference to localStorage
+    localStorage.setItem("aivo-theme", "dark");
+  }, []);
 
   return (
-    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+    <ThemeContext.Provider value={{ isDarkMode }}>
       {children}
     </ThemeContext.Provider>
   );

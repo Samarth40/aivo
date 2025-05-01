@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { useTheme } from "../context/ThemeContext";
-import { SunIcon, MoonIcon, ComputerDesktopIcon } from "@heroicons/react/24/outline";
+import {
+  SunIcon,
+  MoonIcon,
+  ComputerDesktopIcon,
+} from "@heroicons/react/24/outline";
 
 const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -287,8 +291,12 @@ const SettingsPage = () => {
             <div>
               <h3 className="text-md font-medium mb-6">Theme</h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div 
-                  className={`theme-option border rounded-lg p-6 cursor-pointer hover:border-primary ${!isDarkMode ? 'border-primary bg-blue-50' : 'border-gray-200'}`}
+                <div
+                  className={`theme-option border rounded-lg p-6 cursor-pointer hover:border-primary ${
+                    !isDarkMode
+                      ? "border-primary bg-blue-50"
+                      : "border-gray-200"
+                  }`}
                   onClick={() => isDarkMode && toggleTheme()}
                 >
                   <div className="flex justify-center mb-4">
@@ -299,20 +307,34 @@ const SettingsPage = () => {
                     Classic light interface
                   </p>
                 </div>
-                
-                <div 
-                  className={`theme-option border rounded-lg p-6 cursor-pointer hover:border-primary ${isDarkMode ? 'border-primary bg-gray-700' : 'border-gray-200'}`}
+
+                <div
+                  className={`theme-option border rounded-lg p-6 cursor-pointer hover:border-primary ${
+                    isDarkMode
+                      ? "border-primary bg-gray-700"
+                      : "border-gray-200"
+                  }`}
                   onClick={() => !isDarkMode && toggleTheme()}
                 >
                   <div className="flex justify-center mb-4">
                     <MoonIcon className="h-12 w-12 text-indigo-300" />
                   </div>
-                  <h4 className={`font-medium text-center ${isDarkMode ? 'text-gray-100' : ''}`}>Dark Mode</h4>
-                  <p className={`text-sm text-center mt-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  <h4
+                    className={`font-medium text-center ${
+                      isDarkMode ? "text-gray-100" : ""
+                    }`}
+                  >
+                    Dark Mode
+                  </h4>
+                  <p
+                    className={`text-sm text-center mt-2 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-600"
+                    }`}
+                  >
                     Reduced eye strain in low-light
                   </p>
                 </div>
-                
+
                 <div className="theme-option border border-gray-200 rounded-lg p-6 cursor-not-allowed opacity-60">
                   <div className="flex justify-center mb-4">
                     <ComputerDesktopIcon className="h-12 w-12 text-gray-400" />
@@ -324,7 +346,7 @@ const SettingsPage = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="border-t pt-6">
               <h3 className="text-md font-medium mb-4">Interface Density</h3>
               <div className="flex flex-wrap gap-4">
@@ -342,7 +364,7 @@ const SettingsPage = () => {
                 Adjust the spacing and density of UI elements.
               </p>
             </div>
-            
+
             <div className="border-t pt-6">
               <h3 className="text-md font-medium mb-4">Accent Color</h3>
               <div className="flex flex-wrap gap-4">

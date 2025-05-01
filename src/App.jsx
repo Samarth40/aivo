@@ -15,6 +15,8 @@ import SuggestionsPage from "./pages/SuggestionsPage";
 import ComparisonPage from "./pages/ComparisonPage";
 import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 const App = () => {
   return (
@@ -27,6 +29,10 @@ const App = () => {
             <Route path="login" element={<AuthPage type="login" />} />
             <Route path="register" element={<AuthPage type="register" />} />
           </Route>
+
+          {/* Auth routes */}
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
 
           {/* Protected routes - will add authentication later */}
           <Route path="/dashboard" element={<DashboardLayout />}>
