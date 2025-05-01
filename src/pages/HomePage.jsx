@@ -1462,7 +1462,7 @@ const HomePage = () => {
                 whileTap={{ scale: 0.98 }}
               >
                 <Link
-                  to="/auth"
+                  to="/register"
                   className="btn bg-white text-indigo-600 hover:bg-gray-100 btn-lg transition duration-300 hover:shadow-glow-white flex items-center justify-center"
                 >
                   <span>Start Free 14-Day Trial</span>
