@@ -1,1 +1,42 @@
 @import "tailwindcss";
+
+/* Custom styles */
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+  h1 {
+    @apply text-4xl font-bold mb-4;
+  }
+  h2 {
+    @apply text-3xl font-bold mb-3;
+  }
+  h3 {
+    @apply text-2xl font-bold mb-2;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg transition-colors duration-200;
+  }
+  .btn-primary {
+    @apply bg-[#0056b3] text-white hover:bg-blue-700;
+  }
+  .btn-secondary {
+    @apply bg-[#6c757d] text-white hover:bg-gray-600;
+  }
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6;
+  }
+  .input {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0056b3];
+  }
+}
+
+/* Define global CSS variables for easy color reference */
+:root {
+  --color-primary: #0056b3;
+  --color-secondary: #6c757d;
+  --color-accent: #17a2b8;
+}
