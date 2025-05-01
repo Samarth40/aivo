@@ -1,413 +1,267 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { 
+  ArrowDownTrayIcon, 
+  CalendarIcon,
+  ShareIcon,
+  ChevronRightIcon
+} from '@heroicons/react/24/outline';
 
 const ReportsPage = () => {
   const [selectedReport, setSelectedReport] = useState(0);
-  const [timeRange, setTimeRange] = useState('month');
   
-  // Mock data for demonstration
   const reports = [
     {
-      id: 1,
-      date: 'Apr 25, 2025',
-      title: 'Weekly AI Search Trend Report',
-      summary: 'AI search systems now prioritize products with clear compatibility information and user testimonials.',
-      insights: [
-        {
-          title: 'Comparative content is gaining importance',
-          description: 'AI systems are now more likely to recommend products that clearly compare their features to competitors or previous models.',
-          change: '+18%',
-          impact: 'High',
-        },
-        {
-          title: 'Technical specifications in structured format',
-          description: 'Tabular or list-based specifications are more easily parsed by AI systems than paragraph format.',
-          change: '+12%',
-          impact: 'Medium',
-        },
-        {
-          title: 'Use case scenarios improve visibility',
-          description: 'Products with specific use case examples are ranked higher in AI recommendations.',
-          change: '+24%',
-          impact: 'High',
-        },
-      ],
-      productPerformance: {
-        score: 78,
-        change: +2,
-        metrics: {
-          visibility: 78,
-          entityRelations: 65,
-          contentCompleteness: 82,
-          queryMatch: 70,
-        },
-        queries: [
-          {
-            query: 'best noise cancelling headphones for travel',
-            position: 4,
-            change: 0,
-          },
-          {
-            query: 'comfortable wireless headphones for work',
-            position: 6,
-            change: +1,
-          },
-          {
-            query: 'headphones with best battery life',
-            position: 'Not in top 10',
-            change: 0,
-          },
-        ],
-      },
+      title: 'AI Visibility Monthly Report - April 2025',
+      date: 'April 30, 2025',
+      type: 'Monthly Report',
+      summary: 'Overall visibility increased by 18% compared to previous month',
+      sections: [
+        'Executive Summary',
+        'Visibility Score Breakdown',
+        'Product Performance',
+        'Competitor Analysis',
+        'Recommendations'
+      ]
     },
     {
-      id: 2,
-      date: 'Apr 18, 2025',
-      title: 'Weekly AI Search Trend Report',
-      summary: 'Real-world customer experiences are increasingly valued by AI recommendation systems.',
-      insights: [
-        {
-          title: 'Customer testimonials boost credibility',
-          description: 'Products with authentic customer testimonials are receiving higher visibility.',
-          change: '+15%',
-          impact: 'High',
-        },
-        {
-          title: 'Video content improves engagement',
-          description: 'AI systems can now better understand and evaluate video content.',
-          change: '+20%',
-          impact: 'Medium',
-        },
-        {
-          title: 'Schema markup adoption increasing',
-          description: 'Products with detailed schema.org markup are receiving priority.',
-          change: '+10%',
-          impact: 'High',
-        },
-      ],
-      productPerformance: {
-        score: 76,
-        change: +3,
-        metrics: {
-          visibility: 76,
-          entityRelations: 62,
-          contentCompleteness: 81,
-          queryMatch: 68,
-        },
-        queries: [
-          {
-            query: 'best noise cancelling headphones for travel',
-            position: 4,
-            change: +1,
-          },
-          {
-            query: 'comfortable wireless headphones for work',
-            position: 7,
-            change: 0,
-          },
-          {
-            query: 'headphones with best battery life',
-            position: 'Not in top 10',
-            change: 0,
-          },
-        ],
-      },
+      title: 'Product Detail Analysis - Smart Home Hub',
+      date: 'April 25, 2025',
+      type: 'Product Report',
+      summary: 'Product improved in AI response rate but needs better feature descriptions',
+      sections: [
+        'Product Overview',
+        'AI Search Performance',
+        'Content Analysis',
+        'Improvement Areas',
+        'Optimization Steps'
+      ]
     },
     {
-      id: 3,
-      date: 'Apr 11, 2025',
-      title: 'Weekly AI Search Trend Report',
-      summary: 'AI systems are increasingly evaluating products based on relationship to user needs.',
-      insights: [
-        {
-          title: 'Problem-solution framing',
-          description: 'Products that clearly state which problems they solve are receiving higher visibility.',
-          change: '+22%',
-          impact: 'High',
-        },
-        {
-          title: 'Technical jargon decreasing in importance',
-          description: 'Natural language descriptions are now preferred over technical jargon.',
-          change: '-8%',
-          impact: 'Medium',
-        },
-        {
-          title: 'Mobile experience evaluation',
-          description: 'AI systems are factoring in mobile experience when recommending products.',
-          change: '+14%',
-          impact: 'Medium',
-        },
-      ],
-      productPerformance: {
-        score: 73,
-        change: -2,
-        metrics: {
-          visibility: 73,
-          entityRelations: 60,
-          contentCompleteness: 79,
-          queryMatch: 66,
-        },
-        queries: [
-          {
-            query: 'best noise cancelling headphones for travel',
-            position: 5,
-            change: -1,
-          },
-          {
-            query: 'comfortable wireless headphones for work',
-            position: 7,
-            change: -2,
-          },
-          {
-            query: 'headphones with best battery life',
-            position: 'Not in top 10',
-            change: 0,
-          },
-        ],
-      },
-    },
+      title: 'Weekly AI Trend Report',
+      date: 'April 21, 2025',
+      type: 'Trend Analysis',
+      summary: 'New AI models showing preference for more conversational product descriptions',
+      sections: [
+        'AI Search Trends',
+        'Key Algorithm Changes',
+        'Industry Impact Analysis',
+        'Content Strategy Recommendations',
+        'Action Items'
+      ]
+    }
   ];
   
-  // Weekly trends for graphs
-  const weeklyTrends = {
-    dates: ['Mar 28', 'Apr 4', 'Apr 11', 'Apr 18', 'Apr 25'],
-    visibility: [70, 75, 73, 76, 78],
-    competitors: {
-      'Sony WH-1000XM5': [88, 89, 90, 92, 92],
-      'Bose QuietComfort': [80, 82, 83, 85, 86],
-      'Apple AirPods Max': [78, 79, 80, 81, 82],
-    },
-    topQueries: [
-      {
-        name: 'noise cancelling headphones',
-        values: [64, 68, 66, 70, 72],
-      },
-      {
-        name: 'wireless headphones',
-        values: [72, 74, 70, 74, 75],
-      },
-      {
-        name: 'headphones for travel',
-        values: [60, 62, 65, 67, 70],
-      },
-    ],
-  };
-
-  // Helper function to determine color based on change
-  const getChangeColor = (change) => {
-    if (typeof change === 'number') {
-      if (change > 0) return 'text-green-600';
-      if (change < 0) return 'text-red-600';
-      return 'text-gray-600';
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
     }
-    if (change.startsWith('+')) return 'text-green-600';
-    if (change.startsWith('-')) return 'text-red-600';
-    return 'text-gray-600';
+  };
+  
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.5 }
+    }
   };
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-2">AI Search Trend Reports</h1>
-        <p className="text-gray-600">
-          Weekly insights on how AI search systems are evolving and how your product visibility is changing
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Reports List */}
-        <div className="lg:col-span-1">
-          <div className="card h-full">
-            <h2 className="text-lg font-medium mb-4">Recent Reports</h2>
-            <div className="space-y-4">
+    <div className="py-6">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-1">AI Search Reports</h1>
+            <p className="text-gray-600">Review your visibility performance and recommendations</p>
+          </div>
+          
+          <div className="mt-4 sm:mt-0 flex items-center space-x-3">
+            <div className="relative">
+              <select 
+                className="input appearance-none pr-10 py-2"
+                defaultValue="all"
+              >
+                <option value="all">All Reports</option>
+                <option value="monthly">Monthly Reports</option>
+                <option value="product">Product Analysis</option>
+                <option value="trends">Trend Reports</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path 
+                    fillRule="evenodd" 
+                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+            </div>
+            
+            <button className="btn btn-secondary flex items-center text-sm">
+              <CalendarIcon className="h-4 w-4 mr-1" />
+              <span>Date Range</span>
+            </button>
+          </div>
+        </div>
+        
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Reports List */}
+          <motion.div 
+            className="md:w-1/3 bg-white rounded-xl shadow-md overflow-hidden"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <div className="p-4 border-b border-gray-100">
+              <h2 className="text-lg font-semibold">Available Reports</h2>
+            </div>
+            
+            <div className="divide-y divide-gray-100">
               {reports.map((report, index) => (
-                <div 
-                  key={report.id}
-                  className={`p-4 rounded-lg cursor-pointer ${
-                    selectedReport === index ? 'bg-primary bg-opacity-10 border-l-4 border-primary' : 'bg-gray-50 hover:bg-gray-100'
+                <motion.button
+                  key={index}
+                  variants={itemVariants}
+                  className={`p-4 w-full text-left flex items-start transition-colors ${
+                    selectedReport === index ? 'bg-primary/10 border-l-4 border-primary' : 'bg-gray-50 hover:bg-gray-100'
                   }`}
                   onClick={() => setSelectedReport(index)}
                 >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-medium">{report.title}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{report.date}</p>
+                  <div className="flex-1">
+                    <h3 className={`font-medium ${selectedReport === index ? 'text-primary' : 'text-gray-800'}`}>
+                      {report.title}
+                    </h3>
+                    <div className="mt-1 flex items-center text-sm text-gray-500">
+                      <CalendarIcon className="h-4 w-4 mr-1" />
+                      <span>{report.date}</span>
                     </div>
-                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      report.productPerformance.change > 0 
-                        ? 'bg-green-100 text-green-800' 
-                        : report.productPerformance.change < 0
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {report.productPerformance.change > 0 ? '+' : ''}{report.productPerformance.change}%
-                    </div>
+                    <span className="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      {report.type}
+                    </span>
                   </div>
-                </div>
+                  <ChevronRightIcon className={`h-5 w-5 ${selectedReport === index ? 'text-primary' : 'text-gray-400'}`} />
+                </motion.button>
               ))}
             </div>
-
-            <div className="mt-6 pt-4 border-t border-gray-200">
-              <button className="text-primary text-sm hover:underline">
-                View All Reports
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Report Details */}
-        <div className="lg:col-span-2">
-          <div className="card">
-            <div className="flex justify-between items-start mb-6">
+          </motion.div>
+          
+          {/* Report Detail */}
+          <motion.div 
+            className="md:w-2/3 bg-white rounded-xl shadow-md overflow-hidden"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            key={selectedReport}
+          >
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-medium">{reports[selectedReport].title}</h2>
-                <p className="text-sm text-gray-600 mt-1">{reports[selectedReport].date}</p>
+                <h2 className="text-xl font-semibold">{reports[selectedReport].title}</h2>
+                <p className="text-gray-500 text-sm">{reports[selectedReport].date}</p>
               </div>
-              <button className="text-primary text-sm hover:underline">
-                Download PDF
-              </button>
-            </div>
-
-            <div className="mb-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-              <h3 className="font-medium text-blue-800 mb-1">Summary</h3>
-              <p className="text-sm text-gray-700">{reports[selectedReport].summary}</p>
-            </div>
-
-            <div className="mb-8">
-              <h3 className="font-medium mb-4">Key AI Search Trends This Week</h3>
-              <div className="space-y-4">
-                {reports[selectedReport].insights.map((insight, index) => (
-                  <div key={index} className="p-4 bg-white border border-gray-200 rounded-lg">
-                    <div className="flex justify-between">
-                      <h4 className="font-medium text-gray-900">{insight.title}</h4>
-                      <div className="flex items-center">
-                        <span className={`text-sm font-medium ${getChangeColor(insight.change)}`}>
-                          {insight.change}
-                        </span>
-                        <span className="ml-2 px-2 py-0.5 rounded-full text-xs bg-gray-100">
-                          {insight.impact} Impact
-                        </span>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-2">{insight.description}</p>
-                  </div>
-                ))}
+              <div className="flex space-x-2">
+                <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors">
+                  <ShareIcon className="h-5 w-5" />
+                </button>
+                <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors">
+                  <ArrowDownTrayIcon className="h-5 w-5" />
+                </button>
               </div>
             </div>
-
-            <div>
-              <h3 className="font-medium mb-4">Your Product Performance</h3>
+            
+            <div className="p-6">
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-lg">Summary</h3>
+                  <span className="badge badge-primary">AI Insights</span>
+                </div>
+                <p className="text-gray-700">{reports[selectedReport].summary}</p>
+              </div>
               
-              {/* Score Card */}
-              <div className="bg-gray-50 p-4 rounded-lg mb-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700">AI Visibility Score</h4>
-                    <div className="flex items-center mt-1">
-                      <span className="text-2xl font-bold">{reports[selectedReport].productPerformance.score}%</span>
-                      <span className={`ml-2 text-sm ${getChangeColor(reports[selectedReport].productPerformance.change)}`}>
-                        {reports[selectedReport].productPerformance.change > 0 ? '+' : ''}{reports[selectedReport].productPerformance.change}%
-                      </span>
-                    </div>
-                  </div>
-                  <div className="w-24 h-24 rounded-full bg-blue-50 border-8 border-blue-100 flex items-center justify-center">
-                    <span className="text-xl font-bold text-primary">{reports[selectedReport].productPerformance.score}</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
-                  {Object.entries(reports[selectedReport].productPerformance.metrics).map(([key, value]) => (
-                    <div key={key} className="text-center">
-                      <div className="text-sm text-gray-600 mb-1">
-                        {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                      </div>
-                      <div className="font-semibold">{value}%</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Query Performance */}
-              <h4 className="text-sm font-medium text-gray-700 mb-3">Performance for Top Queries</h4>
-              <div className="space-y-3 mb-8">
-                {reports[selectedReport].productPerformance.queries.map((queryData, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">"{queryData.query}"</p>
-                    </div>
-                    <div className="flex items-center">
-                      <span className={`text-sm ${
-                        queryData.position === 'Not in top 10' 
-                          ? 'text-red-600'
-                          : queryData.position <= 3
-                          ? 'text-green-600'
-                          : 'text-yellow-600'
-                      }`}>
-                        {queryData.position}
-                      </span>
-                      <span className={`ml-3 text-sm ${getChangeColor(queryData.change)}`}>
-                        {queryData.change > 0 ? '+' : ''}{queryData.change !== 0 ? queryData.change : ''}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Trend Charts */}
-              <div className="mb-4">
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="text-sm font-medium text-gray-700">Visibility Trend</h4>
-                  <div className="flex space-x-2">
-                    {['week', 'month', '3month'].map(range => (
-                      <button
-                        key={range}
-                        className={`px-3 py-1 text-xs rounded-full ${
-                          timeRange === range 
-                            ? 'bg-primary text-white' 
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
-                        onClick={() => setTimeRange(range)}
-                      >
-                        {range === 'week' ? 'Week' : range === 'month' ? 'Month' : '3 Months'}
-                      </button>
+              <div className="mb-8">
+                <h3 className="font-semibold text-lg mb-4">Report Contents</h3>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <ul className="space-y-3">
+                    {reports[selectedReport].sections.map((section, index) => (
+                      <li key={index} className="flex items-center">
+                        <span className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mr-3">
+                          <span className="text-xs font-medium text-primary">{index + 1}</span>
+                        </span>
+                        <span className="text-gray-800">{section}</span>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
-
-                <div className="bg-white p-4 rounded-lg border border-gray-200">
-                  <div className="h-64 relative">
-                    {/* This is a placeholder for where a real chart would be */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <p className="text-gray-500">Visibility trend chart will be displayed here</p>
+              </div>
+              
+              <div className="mb-8">
+                <h3 className="font-semibold text-lg mb-4">Key Performance Metrics</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <p className="text-sm font-medium text-gray-500">Overall AI Visibility</p>
+                    <p className="mt-1 text-2xl font-bold text-primary">78%</p>
+                    <div className="mt-1 flex items-center text-sm">
+                      <svg 
+                        className="w-4 h-4 text-green-500 mr-1" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                      </svg>
+                      <span className="text-green-500">+12%</span>
                     </div>
-                    
-                    {/* Sample chart visualization with CSS */}
-                    <div className="absolute bottom-0 left-0 right-0 h-40">
-                      <div className="flex h-full items-end justify-between px-2">
-                        {weeklyTrends.visibility.map((value, i) => (
-                          <div key={i} className="w-1/5 px-1 flex flex-col items-center">
-                            <div className="relative w-full">
-                              <div 
-                                className="absolute bottom-0 w-full bg-primary rounded-t"
-                                style={{ height: `${value}%` }}
-                              ></div>
-                            </div>
-                            <span className="text-xs text-gray-500 mt-2">{weeklyTrends.dates[i]}</span>
-                          </div>
-                        ))}
-                      </div>
+                  </div>
+                  
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <p className="text-sm font-medium text-gray-500">Product Mentions</p>
+                    <p className="mt-1 text-2xl font-bold text-primary">1,245</p>
+                    <div className="mt-1 flex items-center text-sm">
+                      <svg 
+                        className="w-4 h-4 text-green-500 mr-1" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                      </svg>
+                      <span className="text-green-500">+28%</span>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <p className="text-sm font-medium text-gray-500">Competitive Rank</p>
+                    <p className="mt-1 text-2xl font-bold text-primary">#2</p>
+                    <div className="mt-1 flex items-center text-sm">
+                      <svg 
+                        className="w-4 h-4 text-green-500 mr-1" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                      </svg>
+                      <span className="text-green-500">+1</span>
                     </div>
                   </div>
                 </div>
               </div>
+              
+              <div>
+                <button className="btn btn-primary w-full sm:w-auto">View Full Report</button>
+              </div>
             </div>
-
-            <div className="mt-6 pt-4 border-t border-gray-200 text-right">
-              <button className="btn btn-secondary mr-2">Previous Report</button>
-              <button className="btn btn-primary">Next Report</button>
-            </div>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

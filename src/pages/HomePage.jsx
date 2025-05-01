@@ -63,7 +63,7 @@ const HomePage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-lg shadow-md">
-              <div className="w-12 h-12 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
                 <span className="text-primary text-xl font-bold">1</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Analyze Content</h3>
@@ -74,7 +74,7 @@ const HomePage = () => {
             </div>
 
             <div className="bg-white p-8 rounded-lg shadow-md">
-              <div className="w-12 h-12 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
                 <span className="text-primary text-xl font-bold">2</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Get Insights</h3>
@@ -85,7 +85,7 @@ const HomePage = () => {
             </div>
 
             <div className="bg-white p-8 rounded-lg shadow-md">
-              <div className="w-12 h-12 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
                 <span className="text-primary text-xl font-bold">3</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Optimize & Track</h3>
