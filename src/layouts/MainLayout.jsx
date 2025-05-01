@@ -6,11 +6,13 @@ import {
   XMarkIcon,
   ChevronRightIcon,
 } from "@heroicons/react/24/outline";
+import { useTheme } from "../context/ThemeContext";
 
 const MainLayout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const { isDarkMode } = useTheme();
 
   // Handle scroll effect for navbar
   useEffect(() => {
@@ -29,11 +31,13 @@ const MainLayout = () => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gray-900">
       {/* Navigation Header */}
       <header
         className={`fixed w-full z-50 transition-all duration-300 ${
-          scrolled ? "bg-white shadow-md py-2" : "bg-transparent py-4"
+          scrolled
+            ? "bg-gray-800 shadow-md shadow-gray-900 py-2"
+            : "bg-transparent py-4"
         }`}
       >
         <div className="container mx-auto px-4 flex justify-between items-center">
@@ -64,7 +68,7 @@ const MainLayout = () => {
                 location.pathname === "/"
                   ? "text-[#4f46e5] font-medium"
                   : scrolled
-                  ? "text-gray-700 hover:text-[#4f46e5]"
+                  ? "text-gray-300 hover:text-[#818cf8]"
                   : "text-white hover:text-white/80"
               } transition-colors`}
             >
@@ -76,7 +80,7 @@ const MainLayout = () => {
                 location.pathname === "/features"
                   ? "text-[#4f46e5] font-medium"
                   : scrolled
-                  ? "text-gray-700 hover:text-[#4f46e5]"
+                  ? "text-gray-300 hover:text-[#818cf8]"
                   : "text-white hover:text-white/80"
               } transition-colors`}
             >
@@ -88,17 +92,20 @@ const MainLayout = () => {
                 location.pathname === "/pricing"
                   ? "text-[#4f46e5] font-medium"
                   : scrolled
-                  ? "text-gray-700 hover:text-[#4f46e5]"
+                  ? "text-gray-300 hover:text-[#818cf8]"
                   : "text-white hover:text-white/80"
               } transition-colors`}
             >
               Pricing
             </Link>
+
             <div className="flex items-center space-x-4">
               <Link
                 to="/login"
                 className={`btn ${
-                  scrolled ? "btn-secondary" : "glass text-white"
+                  scrolled
+                    ? "bg-gray-700 hover:bg-gray-600 text-white"
+                    : "glass text-white"
                 }`}
               >
                 Login
@@ -119,7 +126,7 @@ const MainLayout = () => {
             ) : (
               <Bars3Icon
                 className={`h-6 w-6 ${
-                  scrolled ? "text-gray-800" : "text-white"
+                  scrolled ? "text-gray-200" : "text-white"
                 }`}
               />
             )}
@@ -133,34 +140,35 @@ const MainLayout = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="absolute top-full left-0 right-0 bg-white shadow-lg z-20 md:hidden"
+            className="absolute top-full left-0 right-0 bg-gray-800 shadow-lg z-20 md:hidden"
           >
             <div className="px-4 py-2 space-y-1">
               <Link
                 to="/"
-                className="block p-3 rounded-lg hover:bg-gray-100"
+                className="block p-3 rounded-lg hover:bg-gray-700 text-gray-200"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Home
               </Link>
               <Link
                 to="/features"
-                className="block p-3 rounded-lg hover:bg-gray-100"
+                className="block p-3 rounded-lg hover:bg-gray-700 text-gray-200"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Features
               </Link>
               <Link
                 to="/pricing"
-                className="block p-3 rounded-lg hover:bg-gray-100"
+                className="block p-3 rounded-lg hover:bg-gray-700 text-gray-200"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Pricing
               </Link>
+
               <div className="flex flex-col space-y-2 pt-2 pb-3">
                 <Link
                   to="/login"
-                  className="btn btn-secondary w-full text-center"
+                  className="btn bg-gray-700 text-gray-200 hover:bg-gray-600 w-full text-center"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Login
@@ -179,12 +187,12 @@ const MainLayout = () => {
       </header>
 
       {/* Main Content with top padding for fixed header */}
-      <main className="flex-grow pt-16">
+      <main className="flex-grow pt-16 bg-gray-900 text-gray-100">
         <Outlet />
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-12 border-t border-gray-800">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-1">
