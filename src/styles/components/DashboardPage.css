@@ -1,5 +1,24 @@
 /* DashboardPage component styles */
 
+/* CSS Variables for stat cards */
+:root {
+  --primary-gradient-from: rgba(79, 70, 229, 0.1);
+  --primary-gradient-to: rgba(129, 140, 248, 0.2);
+  --primary-icon-bg: rgba(79, 70, 229, 0.1);
+  
+  --blue-gradient-from: rgba(14, 165, 233, 0.1);
+  --blue-gradient-to: rgba(56, 189, 248, 0.2);
+  --blue-icon-bg: rgba(14, 165, 233, 0.1);
+  
+  --green-gradient-from: rgba(16, 185, 129, 0.1);
+  --green-gradient-to: rgba(52, 211, 153, 0.2);
+  --green-icon-bg: rgba(16, 185, 129, 0.1);
+  
+  --yellow-gradient-from: rgba(245, 158, 11, 0.1);
+  --yellow-gradient-to: rgba(251, 191, 36, 0.2);
+  --yellow-icon-bg: rgba(245, 158, 11, 0.1);
+}
+
 /* Header section */
 .dashboard-header {
   display: flex;
@@ -87,6 +106,26 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
+.stat-card-primary {
+  --from: var(--primary-gradient-from);
+  --to: var(--primary-gradient-to);
+}
+
+.stat-card-blue {
+  --from: var(--blue-gradient-from);
+  --to: var(--blue-gradient-to);
+}
+
+.stat-card-green {
+  --from: var(--green-gradient-from);
+  --to: var(--green-gradient-to);
+}
+
+.stat-card-yellow {
+  --from: var(--yellow-gradient-from);
+  --to: var(--yellow-gradient-to);
+}
+
 .stat-card-header {
   display: flex;
   justify-content: space-between;
@@ -108,6 +147,22 @@
 .stat-card-icon-container {
   padding: 0.5rem;
   border-radius: 0.5rem;
+}
+
+.icon-container-primary {
+  background-color: var(--primary-icon-bg);
+}
+
+.icon-container-blue {
+  background-color: var(--blue-icon-bg);
+}
+
+.icon-container-green {
+  background-color: var(--green-icon-bg);
+}
+
+.icon-container-yellow {
+  background-color: var(--yellow-icon-bg);
 }
 
 .stat-card-metric {
@@ -153,6 +208,26 @@
 .progress-bar-fill {
   height: 100%;
   border-radius: 9999px;
+}
+
+.progress-fill-primary {
+  background-color: #4f46e5;
+}
+
+.progress-fill-blue {
+  background-color: #0ea5e9;
+}
+
+.progress-fill-green {
+  background-color: #10b981;
+}
+
+.progress-fill-yellow {
+  background-color: #f59e0b;
+}
+
+.progress-fill-red {
+  background-color: #ef4444;
 }
 
 /* Chart containers */
@@ -254,6 +329,18 @@
   height: 0.75rem;
   border-radius: 9999px;
   margin-right: 0.5rem;
+}
+
+.indicator-red {
+  background-color: #ef4444;
+}
+
+.indicator-yellow {
+  background-color: #f59e0b;
+}
+
+.indicator-green {
+  background-color: #10b981;
 }
 
 .improvement-title {
