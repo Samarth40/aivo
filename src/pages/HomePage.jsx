@@ -15,7 +15,6 @@ import {
   CheckCircleIcon,
   SparklesIcon,
   ArrowTrendingUpIcon,
-  PlayCircleIcon,
   XMarkIcon,
   ChevronUpIcon,
   ArrowDownIcon,
@@ -25,7 +24,6 @@ import { StarIcon } from "@heroicons/react/24/solid";
 const HomePage = () => {
   const { isDarkMode } = useTheme();
   const [isVisible, setIsVisible] = useState({});
-  const [showVideo, setShowVideo] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [activeSection, setActiveSection] = useState(null);
 
@@ -205,56 +203,43 @@ const HomePage = () => {
         <ChevronUpIcon className="w-5 h-5" />
       </motion.button>
 
-      {/* Video demo modal */}
-      <AnimatePresence>
-        {showVideo && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className={`relative w-full max-w-4xl rounded-2xl overflow-hidden ${
-                isDarkMode ? "bg-gray-900" : "bg-white"
-              } shadow-2xl`}
-            >
-              <button
-                onClick={() => setShowVideo(false)}
-                className="absolute top-4 right-4 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors z-10"
-                aria-label="Close video"
-              >
-                <XMarkIcon className="w-6 h-6" />
-              </button>
-
-              <div className="aspect-video w-full">
-                {/* Replace with actual video or demo content */}
-                <div className="w-full h-full bg-gradient-to-br from-indigo-600 to-purple-700 flex flex-col items-center justify-center text-white p-8">
-                  <h3 className="text-2xl md:text-3xl font-bold mb-6">
-                    See AIVO in Action
-                  </h3>
-                  <p className="text-lg mb-8 max-w-xl text-center">
-                    This is where your product demo video would be displayed,
-                    showing how AIVO works to improve AI search visibility.
-                  </p>
-                  <div className="bg-white/20 backdrop-blur rounded-lg p-8 w-full max-w-xl">
-                    <div className="h-8 w-full bg-white/30 rounded-lg mb-4 animate-pulse"></div>
-                    <div className="h-8 w-3/4 bg-white/30 rounded-lg animate-pulse"></div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Hero Section with cleaner design */}
+      {/* Hero Section with enhanced design */}
       <section
         className={`relative py-20 md:py-28 lg:py-32 overflow-hidden bg-gradient-to-br ${heroGradient}`}
       >
+        {/* Enhanced animated background */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Floating shapes for visual appeal */}
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={i}
+              className={`absolute rounded-full ${
+                isDarkMode ? "bg-indigo-900/20" : "bg-indigo-500/10"
+              }`}
+              style={{
+                width: Math.random() * 200 + 50,
+                height: Math.random() * 200 + 50,
+                left: `${Math.random() * 90}%`,
+                top: `${Math.random() * 90}%`,
+              }}
+              animate={{
+                x: [0, Math.random() * 40 - 20],
+                y: [0, Math.random() * 40 - 20],
+                scale: [1, Math.random() * 0.3 + 0.8, 1],
+              }}
+              transition={{
+                duration: Math.random() * 10 + 15,
+                ease: "easeInOut",
+                repeat: Infinity,
+                repeatType: "reverse",
+              }}
+            />
+          ))}
+
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-indigo-800/10 dark:to-indigo-900/20"></div>
+        </div>
+
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -263,30 +248,78 @@ const HomePage = () => {
             className="text-center max-w-5xl mx-auto"
           >
             <motion.div variants={fadeInUp}>
-              <motion.span
-                className="inline-block px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300 font-medium text-sm mb-6"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              <motion.div
+                className="flex justify-center mb-6"
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
               >
-                AI-Powered Visibility for Your Products
-              </motion.span>
+                <motion.span
+                  className="inline-block px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300 font-medium text-sm"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <motion.span
+                    className="inline-block mr-2"
+                    animate={{ rotate: [0, 10, 0, -10, 0] }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 2,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    ✨
+                  </motion.span>
+                  AI-Powered Visibility for Your Products
+                </motion.span>
+              </motion.div>
             </motion.div>
 
             <motion.h1
               variants={fadeInUp}
               className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight tracking-tight"
             >
-              <span className="relative inline-block">
+              <motion.span
+                className="relative inline-block"
+                animate={{
+                  textShadow: isDarkMode
+                    ? [
+                        "0 0 0px rgba(99, 102, 241, 0)",
+                        "0 0 15px rgba(99, 102, 241, 0.5)",
+                        "0 0 0px rgba(99, 102, 241, 0)",
+                      ]
+                    : [
+                        "0 0 0px rgba(99, 102, 241, 0)",
+                        "0 0 10px rgba(99, 102, 241, 0.3)",
+                        "0 0 0px rgba(99, 102, 241, 0)",
+                      ],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                }}
+              >
                 Optimize
                 <motion.span
-                  className="absolute -bottom-2 left-0 w-full h-1 bg-indigo-500"
+                  className="absolute -bottom-2 left-0 w-full h-1.5 bg-indigo-500"
                   initial={{ scaleX: 0, originX: 0 }}
                   animate={{ scaleX: 1 }}
                   transition={{ delay: 0.5, duration: 0.8 }}
                 />
-              </span>{" "}
+              </motion.span>{" "}
               Your Product Visibility for
-              <span className="gradient-text block mt-2">AI Search</span>
+              <motion.span
+                className="gradient-text block mt-2"
+                animate={{
+                  color: isDarkMode
+                    ? ["#818cf8", "#a78bfa", "#818cf8"]
+                    : ["#4f46e5", "#6366f1", "#4f46e5"],
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+              >
+                AI Search
+              </motion.span>
             </motion.h1>
 
             <motion.p
@@ -298,7 +331,7 @@ const HomePage = () => {
               era of search.
             </motion.p>
 
-            {/* New Call-to-Action Buttons */}
+            {/* Enhanced Call-to-Action Buttons */}
             <motion.div
               variants={fadeInUp}
               className="flex flex-col sm:flex-row justify-center gap-4 md:gap-6 mb-10"
@@ -306,64 +339,75 @@ const HomePage = () => {
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
-                className="shadow-lg"
+                className="shadow-xl"
               >
                 <Link
                   to="/register"
-                  className="btn bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 text-lg font-medium rounded-lg transition duration-300 flex items-center justify-center"
+                  className="btn bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 text-lg font-medium rounded-lg transition duration-300 flex items-center justify-center group relative overflow-hidden border-2 border-indigo-400 shadow-[0_0_15px_rgba(79,70,229,0.5)]"
                 >
-                  <span>Get Started</span>
-                  <ArrowRightIcon className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
+                  <span className="relative z-10 text-white tracking-wide text-shadow-sm">
+                    Get Started
+                  </span>
+                  <motion.div
+                    className="ml-2 relative z-10"
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 1.5,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <ArrowRightIcon className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                  </motion.div>
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-600 opacity-100"
+                    animate={{
+                      backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                    }}
+                    transition={{
+                      duration: 5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    style={{ backgroundSize: "200% 100%" }}
+                  />
                 </Link>
               </motion.div>
 
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
+                className="shadow-lg"
               >
                 <button
                   onClick={() => scrollToSection("how-it-works")}
                   className={`btn border-2 ${
                     isDarkMode
-                      ? "border-white text-white hover:bg-white/10"
-                      : "border-indigo-600 text-indigo-600 hover:bg-indigo-50"
-                  } px-8 py-4 text-lg font-medium rounded-lg transition duration-300`}
+                      ? "border-indigo-400 bg-indigo-900/40 text-indigo-100 hover:bg-indigo-800/60 shadow-[0_0_15px_rgba(129,140,248,0.3)]"
+                      : "border-indigo-600 text-indigo-600 hover:bg-indigo-50 shadow-[0_0_15px_rgba(79,70,229,0.3)]"
+                  } px-8 py-4 text-lg font-medium rounded-lg transition duration-300 relative`}
                 >
-                  How It Works
+                  <span className="relative z-10">How It Works</span>
+                  {isDarkMode && (
+                    <motion.div
+                      className="absolute inset-0 bg-indigo-500/10 rounded-lg"
+                      animate={{ opacity: [0.1, 0.2, 0.1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  )}
                 </button>
               </motion.div>
             </motion.div>
-
-            {/* Video play button */}
-            <motion.div variants={fadeInUp} className="mt-6">
-              <button
-                onClick={() => setShowVideo(true)}
-                className="group inline-flex items-center"
-              >
-                <motion.span
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-lg mr-3"
-                  whileHover={{ scale: 1.1 }}
-                >
-                  <PlayCircleIcon className="w-6 h-6 text-indigo-600" />
-                </motion.span>
-                <span
-                  className={`font-medium ${
-                    isDarkMode ? "text-white" : "text-gray-700"
-                  }`}
-                >
-                  Watch Demo Video
-                </span>
-              </button>
-            </motion.div>
           </motion.div>
 
-          {/* Hero image or illustration */}
+          {/* Enhanced hero image or illustration */}
           <motion.div
             variants={fadeInUp}
             className="mt-12 max-w-4xl mx-auto"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.8 }}
+            whileHover={{ y: -8, transition: { duration: 0.3 } }}
           >
             <div
               className={`relative rounded-xl overflow-hidden shadow-2xl ${
@@ -377,46 +421,237 @@ const HomePage = () => {
                   } backdrop-blur-sm`}
                 >
                   <div className="w-full max-w-3xl">
+                    {/* Animated dashboard preview */}
                     <div
                       className={`h-12 w-full ${
                         isDarkMode ? "bg-indigo-900/30" : "bg-indigo-100"
-                      } rounded-lg mb-6`}
-                    ></div>
+                      } rounded-lg mb-6 flex items-center px-4`}
+                    >
+                      <motion.div
+                        className="h-4 w-20 bg-indigo-400 rounded"
+                        animate={{ opacity: [0.5, 0.8, 0.5] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      ></motion.div>
+                      <div className="flex-grow"></div>
+                      <motion.div
+                        className={`h-6 w-6 rounded-full ${
+                          isDarkMode ? "bg-indigo-400" : "bg-indigo-500"
+                        }`}
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      ></motion.div>
+                    </div>
                     <div className="grid grid-cols-3 gap-4">
-                      <div
+                      <motion.div
                         className={`h-32 ${
                           isDarkMode ? "bg-indigo-800/40" : "bg-indigo-200/50"
                         } rounded-lg`}
-                      ></div>
-                      <div
+                        whileHover={{
+                          y: -5,
+                          boxShadow: "0 12px 24px -8px rgba(99, 102, 241, 0.3)",
+                        }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="h-full w-full flex flex-col justify-center items-center">
+                          <motion.div
+                            className={`w-10 h-10 mb-2 rounded-full ${
+                              isDarkMode ? "bg-indigo-700" : "bg-indigo-300"
+                            } flex items-center justify-center`}
+                            animate={{
+                              boxShadow: [
+                                "0 0 0 rgba(79, 70, 229, 0)",
+                                "0 0 15px rgba(79, 70, 229, 0.5)",
+                                "0 0 0 rgba(79, 70, 229, 0)",
+                              ],
+                            }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                          >
+                            <div
+                              className={`w-6 h-6 ${
+                                isDarkMode ? "bg-indigo-500" : "bg-indigo-500"
+                              } rounded-full`}
+                            ></div>
+                          </motion.div>
+                          <div
+                            className={`w-16 h-2 ${
+                              isDarkMode ? "bg-indigo-700" : "bg-indigo-300"
+                            } rounded-full`}
+                          ></div>
+                        </div>
+                      </motion.div>
+                      <motion.div
                         className={`h-32 ${
                           isDarkMode ? "bg-blue-800/40" : "bg-blue-200/50"
                         } rounded-lg`}
-                      ></div>
-                      <div
+                        whileHover={{
+                          y: -5,
+                          boxShadow: "0 12px 24px -8px rgba(59, 130, 246, 0.3)",
+                        }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="h-full w-full flex flex-col justify-center items-center p-4">
+                          <motion.div
+                            className="w-full h-2/3"
+                            animate={{ height: ["60%", "80%", "60%"] }}
+                            transition={{
+                              duration: 5,
+                              repeat: Infinity,
+                              repeatType: "reverse",
+                            }}
+                          >
+                            <div className="h-full w-full flex items-end">
+                              <div className="flex-1 mx-0.5">
+                                <motion.div
+                                  className={`w-full ${
+                                    isDarkMode ? "bg-blue-600" : "bg-blue-400"
+                                  } rounded-sm`}
+                                  animate={{ height: ["30%", "70%", "30%"] }}
+                                  transition={{
+                                    duration: 2,
+                                    repeat: Infinity,
+                                    repeatType: "reverse",
+                                    delay: 0.5,
+                                  }}
+                                ></motion.div>
+                              </div>
+                              <div className="flex-1 mx-0.5">
+                                <motion.div
+                                  className={`w-full ${
+                                    isDarkMode ? "bg-blue-600" : "bg-blue-400"
+                                  } rounded-sm`}
+                                  animate={{ height: ["60%", "40%", "60%"] }}
+                                  transition={{
+                                    duration: 2.3,
+                                    repeat: Infinity,
+                                    repeatType: "reverse",
+                                  }}
+                                ></motion.div>
+                              </div>
+                              <div className="flex-1 mx-0.5">
+                                <motion.div
+                                  className={`w-full ${
+                                    isDarkMode ? "bg-blue-600" : "bg-blue-400"
+                                  } rounded-sm`}
+                                  animate={{ height: ["45%", "85%", "45%"] }}
+                                  transition={{
+                                    duration: 1.8,
+                                    repeat: Infinity,
+                                    repeatType: "reverse",
+                                    delay: 0.2,
+                                  }}
+                                ></motion.div>
+                              </div>
+                            </div>
+                          </motion.div>
+                          <div
+                            className={`w-16 h-2 mt-2 ${
+                              isDarkMode ? "bg-blue-700" : "bg-blue-300"
+                            } rounded-full`}
+                          ></div>
+                        </div>
+                      </motion.div>
+                      <motion.div
                         className={`h-32 ${
                           isDarkMode ? "bg-purple-800/40" : "bg-purple-200/50"
                         } rounded-lg`}
-                      ></div>
+                        whileHover={{
+                          y: -5,
+                          boxShadow: "0 12px 24px -8px rgba(126, 34, 206, 0.3)",
+                        }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <div className="h-full w-full flex flex-col justify-center items-center p-4">
+                          <motion.div
+                            className={`w-14 h-14 rounded-full ${
+                              isDarkMode
+                                ? "bg-purple-700/50"
+                                : "bg-purple-300/50"
+                            } flex items-center justify-center`}
+                            animate={{ rotate: 360 }}
+                            transition={{
+                              duration: 10,
+                              repeat: Infinity,
+                              ease: "linear",
+                            }}
+                          >
+                            <div
+                              className={`w-10 h-10 rounded-full ${
+                                isDarkMode
+                                  ? "bg-purple-600/70"
+                                  : "bg-purple-400/70"
+                              } flex items-center justify-center`}
+                            >
+                              <div
+                                className={`w-5 h-5 rounded-full ${
+                                  isDarkMode ? "bg-purple-500" : "bg-purple-500"
+                                }`}
+                              ></div>
+                            </div>
+                          </motion.div>
+                          <div
+                            className={`w-16 h-2 mt-4 ${
+                              isDarkMode ? "bg-purple-700" : "bg-purple-300"
+                            } rounded-full`}
+                          ></div>
+                        </div>
+                      </motion.div>
                     </div>
-                    <div
+                    <motion.div
                       className={`h-10 w-3/4 mt-6 ${
                         isDarkMode ? "bg-green-800/40" : "bg-green-200/50"
                       } rounded-lg`}
-                    ></div>
+                      animate={{
+                        width: ["70%", "85%", "70%"],
+                        backgroundColor: isDarkMode
+                          ? [
+                              "rgba(22, 101, 52, 0.4)",
+                              "rgba(21, 128, 61, 0.4)",
+                              "rgba(22, 101, 52, 0.4)",
+                            ]
+                          : [
+                              "rgba(134, 239, 172, 0.5)",
+                              "rgba(187, 247, 208, 0.5)",
+                              "rgba(134, 239, 172, 0.5)",
+                            ],
+                      }}
+                      transition={{
+                        duration: 5,
+                        repeat: Infinity,
+                        repeatType: "reverse",
+                      }}
+                    ></motion.div>
                   </div>
                 </div>
               </div>
-              <div className="absolute top-3 right-3 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+              <motion.div
+                className="absolute top-3 right-3 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-full"
+                animate={{
+                  scale: [1, 1.08, 1],
+                  boxShadow: [
+                    "0 0 0px rgba(99, 102, 241, 0)",
+                    "0 0 10px rgba(99, 102, 241, 0.5)",
+                    "0 0 0px rgba(99, 102, 241, 0)",
+                  ],
+                }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
                 AI-Powered Dashboard
-              </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>
 
-        {/* Decorative shapes */}
-        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-indigo-500 rounded-full opacity-10 blur-3xl"></div>
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-500 rounded-full opacity-10 blur-3xl"></div>
+        {/* Enhanced decorative shapes */}
+        <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-indigo-500 rounded-full opacity-10 blur-3xl"></div>
+        <div className="absolute -top-24 -right-24 w-80 h-80 bg-blue-500 rounded-full opacity-10 blur-3xl"></div>
+        <motion.div
+          className="absolute bottom-12 left-1/2 transform -translate-x-1/2 w-3/4 h-12 bg-indigo-500/30 blur-3xl rounded-full"
+          animate={{
+            width: ["70%", "80%", "70%"],
+            opacity: [0.2, 0.3, 0.2],
+          }}
+          transition={{ duration: 5, repeat: Infinity, repeatType: "reverse" }}
+        ></motion.div>
       </section>
 
       {/* Stats Section with animated counters */}
