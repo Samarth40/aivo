@@ -1,415 +1,158 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import "../styles/components/AnalyzePage.css";
-import {
-  MagnifyingGlassIcon,
-  DocumentTextIcon,
-  LinkIcon,
-  SparklesIcon,
-  DocumentDuplicateIcon,
-  ClockIcon,
-  CheckCircleIcon,
-  ArrowPathIcon,
-  ChevronRightIcon,
-  ArrowTrendingUpIcon,
-} from "@heroicons/react/24/outline";
+import { useTheme } from "../context/ThemeContext";
+import useDataLoading from "../context/useDataLoading";
 
 const AnalyzePage = () => {
-  const [url, setUrl] = useState("");
-  const [analyzing, setAnalyzing] = useState(false);
-  const [analyzed, setAnalyzed] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
+  const { isDarkMode } = useTheme();
+  const { withLoading } = useDataLoading();
+  const [data, setData] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Demo analysis data
-  const analysisData = {
-    score: 68,
-    recommendations: [
-      {
-        category: "Content Structure",
-        score: 72,
-        details:
-          "Your product structure follows best practices but could be improved.",
-        suggestions: [
-          "Add more hierarchical headings to organize product information",
-          "Create distinct sections for features, benefits, and specifications",
-          "Include a FAQ section addressing common customer questions",
-        ],
-      },
-      {
-        category: "Natural Language",
-        score: 65,
-        details: "Your product descriptions need more conversational elements.",
-        suggestions: [
-          "Replace technical jargon with everyday language where possible",
-          "Frame features in terms of how they solve customer problems",
-          "Use more active voice in your product descriptions",
-        ],
-      },
-      {
-        category: "Entity Relationships",
-        score: 74,
-        details:
-          "Product relationships to use cases and related concepts are good.",
-        suggestions: [
-          "Add more specific examples of when your product is most useful",
-          "Create stronger connections to industry-specific terminology",
-          "Mention complementary products or services",
-        ],
-      },
-      {
-        category: "Query Matching",
-        score: 62,
-        details: "Your content could better match common AI queries.",
-        suggestions: [
-          "Include questions users might ask about your product directly in content",
-          "Add comparison sections that AI systems can easily extract",
-          "Include definitive statements about what problems your product solves",
-        ],
-      },
-    ],
+  // Simulate API call to fetch data
+  const fetchData = async () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          products: [
+            { id: 1, name: "Product A", score: 87 },
+            { id: 2, name: "Product B", score: 65 },
+            { id: 3, name: "Product C", score: 92 },
+          ],
+          recommendations: [
+            "Optimize product titles for AI search",
+            "Add more detailed product features",
+            "Include usage scenarios in descriptions",
+          ],
+        });
+      }, 2000); // Simulate 2 second API delay
+    });
   };
 
-  const handleAnalyze = () => {
-    if (!url) return;
+  useEffect(() => {
+    // Load data with loading screen when component mounts
+    const loadData = async () => {
+      const result = await withLoading(
+        fetchData,
+        "Analyzing your product data..."
+      );
+      setData(result);
+      setIsLoaded(true);
+    };
 
-    setAnalyzing(true);
+    loadData();
+  }, [withLoading]);
 
-    // Simulate analysis process
-    setTimeout(() => {
-      setAnalyzing(false);
-      setAnalyzed(true);
-    }, 3000);
-  };
-
-  const handleReset = () => {
-    setUrl("");
-    setAnalyzed(false);
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
+  // Function to simulate running a new analysis
+  const runNewAnalysis = async () => {
+    // Use the withLoading hook to show loading screen during operation
+    const result = await withLoading(
+      async () => {
+        // Simulate API call
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({
+              products: [
+                { id: 1, name: "Product A", score: 89 },
+                { id: 2, name: "Product B", score: 72 },
+                { id: 3, name: "Product C", score: 94 },
+              ],
+              recommendations: [
+                "Implement semantic product descriptions",
+                "Add more detailed specifications",
+                "Enhance product images with AI-friendly metadata",
+              ],
+            });
+          }, 3000); // Longer operation
+        });
       },
-    },
+      "Performing deep product analysis...",
+      2000 // Minimum duration of 2 seconds
+    );
+
+    setData(result);
   };
 
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.5 },
-    },
-  };
+  if (!isLoaded) {
+    return null; // The loading is handled by the NavigationLoader
+  }
 
   return (
-    <div className="analyze-page">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 className="analyze-page-title gradient-text">
-          AI Search Visibility Analysis
-        </h1>
-        <p className="analyze-page-description">
-          Analyze any product page to see how it performs in AI search systems.
-        </p>
+    <div
+      className={`min-h-screen py-10 px-4 ${
+        isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-800"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className="text-3xl font-bold mb-8">Product Analysis</h1>
 
-        {!analyzed ? (
-          <div className="card p-8 max-w-3xl">
-            <h2 className="text-xl font-semibold mb-6">
-              Enter a product URL or paste content
-            </h2>
-
-            <div className="space-y-6">
-              <div className="analyze-tab-group">
-                <button
-                  onClick={() => setActiveTab("url")}
-                  className={`analyze-tab ${
-                    activeTab === "url" ? "active" : ""
-                  }`}
-                >
-                  <LinkIcon className="analyze-tab-icon" />
-                  <span>URL</span>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab("text")}
-                  className={`analyze-tab ${
-                    activeTab === "text" ? "active" : ""
-                  }`}
-                >
-                  <DocumentTextIcon className="analyze-tab-icon" />
-                  <span>Text</span>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab("document")}
-                  className={`analyze-tab ${
-                    activeTab === "document" ? "active" : ""
-                  }`}
-                >
-                  <DocumentDuplicateIcon className="analyze-tab-icon" />
-                  <span>Document</span>
-                </button>
-              </div>
-
-              {activeTab === "url" && (
-                <div className="space-y-4">
-                  <div className="url-input-container">
-                    <div className="url-input-icon">
-                      <LinkIcon className="h-5 w-5 text-gray-400" />
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            <div
+              className={`p-6 rounded-lg ${
+                isDarkMode ? "bg-gray-800" : "bg-white"
+              } shadow-lg`}
+            >
+              <h2 className="text-xl font-semibold mb-4">
+                AI Visibility Scores
+              </h2>
+              <div className="space-y-4">
+                {data?.products.map((product) => (
+                  <div
+                    key={product.id}
+                    className="flex items-center justify-between"
+                  >
+                    <span>{product.name}</span>
+                    <div className="flex items-center">
+                      <div className="w-48 h-3 rounded-full overflow-hidden bg-gray-300 dark:bg-gray-700 mr-3">
+                        <div
+                          className={`h-full ${
+                            product.score > 85
+                              ? "bg-green-500"
+                              : product.score > 70
+                              ? "bg-yellow-500"
+                              : "bg-red-500"
+                          }`}
+                          style={{ width: `${product.score}%` }}
+                        />
+                      </div>
+                      <span className="font-medium">{product.score}%</span>
                     </div>
-                    <input
-                      type="text"
-                      className="input url-input"
-                      placeholder="https://example.com/your-product"
-                      value={url}
-                      onChange={(e) => setUrl(e.target.value)}
-                    />
                   </div>
-
-                  <div className="recent-items-label">
-                    <ClockIcon className="h-4 w-4 mr-1" />
-                    <span>Recently analyzed:</span>
-                  </div>
-
-                  <div className="space-y-2">
-                    {[
-                      "https://demo-store.com/premium-headphones",
-                      "https://tech-gadgets.io/smart-watch",
-                    ].map((item, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setUrl(item)}
-                        className="recent-item"
-                      >
-                        <span className="recent-item-number">{index + 1}</span>
-                        <span className="recent-item-text">{item}</span>
-                        <ChevronRightIcon className="recent-item-icon" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {activeTab === "text" && (
-                <div>
-                  <textarea
-                    className="w-full h-40 rounded-xl border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-[#4f46e5] resize-none"
-                    placeholder="Paste your product content here..."
-                  ></textarea>
-                </div>
-              )}
-
-              {activeTab === "document" && (
-                <div className="file-upload-area">
-                  <DocumentDuplicateIcon className="file-upload-icon" />
-                  <p className="file-upload-text">Drag & drop your file here</p>
-                  <p className="file-upload-subtext">
-                    Supports PDF, DOCX, HTML (Max 10MB)
-                  </p>
-                  <button className="btn btn-secondary">Browse Files</button>
-                </div>
-              )}
-
-              <div className="flex justify-end">
-                <button
-                  onClick={handleAnalyze}
-                  disabled={analyzing || !url}
-                  className="btn btn-primary flex items-center"
-                >
-                  {analyzing ? (
-                    <>
-                      <ArrowPathIcon className="h-5 w-5 mr-2 animate-spin" />
-                      Analyzing...
-                    </>
-                  ) : (
-                    <>
-                      <MagnifyingGlassIcon className="h-5 w-5 mr-2" />
-                      Analyze
-                    </>
-                  )}
-                </button>
+                ))}
               </div>
+            </div>
+
+            <div
+              className={`p-6 rounded-lg ${
+                isDarkMode ? "bg-gray-800" : "bg-white"
+              } shadow-lg`}
+            >
+              <h2 className="text-xl font-semibold mb-4">
+                AI Search Recommendations
+              </h2>
+              <ul className="list-disc pl-5 space-y-2">
+                {data?.recommendations.map((rec, index) => (
+                  <li key={index}>{rec}</li>
+                ))}
+              </ul>
             </div>
           </div>
-        ) : (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <div className="results-header">
-              <div>
-                <div className="results-title-container">
-                  <h2 className="results-title">Analysis Results</h2>
-                  <span className="badge badge-primary">Product Page</span>
-                </div>
-                <p className="results-url">{url}</p>
-              </div>
-              <div className="results-actions">
-                <button
-                  onClick={handleReset}
-                  className="btn btn-secondary mr-3 flex items-center text-sm"
-                >
-                  <ArrowPathIcon className="action-button-icon" />
-                  New Analysis
-                </button>
-                <button className="btn btn-accent flex items-center text-sm">
-                  <SparklesIcon className="action-button-icon" />
-                  Optimize
-                </button>
-              </div>
-            </div>
 
-            {/* Score Overview */}
-            <motion.div variants={itemVariants} className="card mb-8">
-              <div className="score-overview">
-                <div className="score-circle-container">
-                  <svg className="w-40 h-40" viewBox="0 0 36 36">
-                    <circle
-                      cx="18"
-                      cy="18"
-                      r="16"
-                      fill="none"
-                      stroke="#e5e7eb"
-                      strokeWidth="2"
-                    ></circle>
-                    <circle
-                      cx="18"
-                      cy="18"
-                      r="16"
-                      fill="none"
-                      stroke="#4f46e5"
-                      strokeWidth="2"
-                      strokeDasharray={`${analysisData.score} ${
-                        100 - analysisData.score
-                      }`}
-                      strokeDashoffset="25"
-                      className="transition-all duration-1000 ease-out"
-                    ></circle>
-                  </svg>
-
-                  <div className="score-circle-text">
-                    <div className="score-circle-value">
-                      {analysisData.score}
-                    </div>
-                    <div className="score-circle-label">out of 100</div>
-                  </div>
-                </div>
-
-                <div className="score-details">
-                  <h3 className="score-details-title">
-                    AI Search Visibility Score
-                  </h3>
-                  <p className="score-details-description">
-                    Your product page has moderate visibility in AI search
-                    systems. With targeted improvements, you could see a
-                    significant boost in how often your product is recommended.
-                  </p>
-                  <div className="score-badges">
-                    <div className="score-badge score-badge-primary">
-                      <ArrowTrendingUpIcon className="score-badge-icon text-[#4f46e5]" />
-                      <span className="score-badge-text-primary">
-                        Top 40% of products
-                      </span>
-                    </div>
-                    <div className="score-badge score-badge-success">
-                      <CheckCircleIcon className="score-badge-icon text-green-600" />
-                      <span className="score-badge-text-success">
-                        Good entity linking
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Detailed Analysis Sections */}
-            {analysisData.recommendations.map((rec, index) => (
-              <motion.div
-                variants={itemVariants}
-                key={index}
-                className="card mb-6"
-              >
-                <div className="recommendation-header">
-                  <div className="recommendation-title-container">
-                    <div
-                      className={`recommendation-score ${
-                        rec.score >= 80
-                          ? "recommendation-score-good"
-                          : rec.score >= 70
-                          ? "recommendation-score-moderate"
-                          : rec.score >= 60
-                          ? "recommendation-score-fair"
-                          : "recommendation-score-poor"
-                      }`}
-                    >
-                      <span className="recommendation-score-text">
-                        {rec.score}
-                      </span>
-                    </div>
-                    <h3 className="recommendation-title">{rec.category}</h3>
-                  </div>
-
-                  <div className="recommendation-progress">
-                    <div className="recommendation-progress-bg">
-                      <div
-                        className={`recommendation-progress-bar ${
-                          rec.score >= 80
-                            ? "recommendation-progress-good"
-                            : rec.score >= 70
-                            ? "recommendation-progress-moderate"
-                            : rec.score >= 60
-                            ? "recommendation-progress-fair"
-                            : "recommendation-progress-poor"
-                        }`}
-                        style={{ width: `${rec.score}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-
-                <p className="recommendation-details">{rec.details}</p>
-
-                <div className="recommendation-suggestions">
-                  <h4 className="recommendation-suggestions-title">
-                    Suggestions:
-                  </h4>
-                  <ul className="recommendation-suggestions-list">
-                    {rec.suggestions.map((suggestion, i) => (
-                      <li key={i} className="recommendation-suggestion-item">
-                        <span className="recommendation-suggestion-number">
-                          <span className="recommendation-suggestion-number-text">
-                            {i + 1}
-                          </span>
-                        </span>
-                        <span className="recommendation-suggestion-text">
-                          {suggestion}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </motion.div>
-            ))}
-
-            <motion.div variants={itemVariants} className="final-actions">
-              <button className="btn btn-primary mr-4">
-                Generate Improvement Report
-              </button>
-              <button className="btn btn-secondary">
-                Schedule Optimization Call
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </motion.div>
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={runNewAnalysis}
+              className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition"
+            >
+              Run New Analysis
+            </button>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 };

@@ -14,26 +14,23 @@ const NotFoundPage = () => {
   const particlesRef = useRef([]);
   const requestRef = useRef();
 
-  // Generate 3D-like particles for background
+  // Generate enhanced 3D-like particles for background
   useEffect(() => {
     const createParticles = () => {
       const particles = [];
-      for (let i = 0; i < 50; i++) {
+      for (let i = 0; i < 60; i++) {
         particles.push({
           x: Math.random() * window.innerWidth,
           y: Math.random() * window.innerHeight,
           size: Math.random() * 6 + 2,
-          speedX: (Math.random() - 0.5) * 2,
-          speedY: (Math.random() - 0.5) * 2,
+          speedX: (Math.random() - 0.5) * 1.5,
+          speedY: (Math.random() - 0.5) * 1.5,
           depth: Math.random() * 5,
           opacity: Math.random() * 0.5 + 0.1,
-          color: isDarkMode
-            ? `rgba(${99 + Math.random() * 50}, ${102 + Math.random() * 50}, ${
-                241 + Math.random() * 14
-              }, ${Math.random() * 0.5 + 0.1})`
-            : `rgba(${79 + Math.random() * 40}, ${70 + Math.random() * 40}, ${
-                229 + Math.random() * 26
-              }, ${Math.random() * 0.3 + 0.05})`,
+          // Enhanced color palette for dark theme with more vibrant indigo/purple tones
+          color: `rgba(${99 + Math.random() * 60}, ${
+            102 + Math.random() * 60
+          }, ${241 + Math.random() * 14}, ${Math.random() * 0.6 + 0.2})`,
         });
       }
       return particles;
@@ -51,20 +48,20 @@ const NotFoundPage = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         particlesRef.current.forEach((p) => {
-          // 3D perspective effect
-          const scale = 1 / (p.depth * 0.1 + 1);
+          // Enhanced 3D perspective effect
+          const scale = 1 / (p.depth * 0.12 + 1);
 
-          // Mouse interaction
+          // Improved mouse interaction with more responsiveness
           if (mousePosition.x && mousePosition.y) {
             const dx = p.x - mousePosition.x;
             const dy = p.y - mousePosition.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
-            if (distance < 150) {
+            if (distance < 180) {
               const angle = Math.atan2(dy, dx);
-              const force = (150 - distance) / 15;
-              p.x += Math.cos(angle) * force * (isHovering ? 0.5 : 0.1);
-              p.y += Math.sin(angle) * force * (isHovering ? 0.5 : 0.1);
+              const force = (180 - distance) / 12;
+              p.x += Math.cos(angle) * force * (isHovering ? 0.7 : 0.2);
+              p.y += Math.sin(angle) * force * (isHovering ? 0.7 : 0.2);
             }
           }
 
@@ -102,7 +99,7 @@ const NotFoundPage = () => {
         cancelAnimationFrame(requestRef.current);
       };
     }
-  }, [isDarkMode, mousePosition, isHovering]);
+  }, [mousePosition, isHovering]);
 
   // Mouse move handler for interactive particles
   const handleMouseMove = (event) => {
@@ -160,6 +157,11 @@ const NotFoundPage = () => {
     animate: {
       x: [0, -5, 5, -5, 5, 0],
       opacity: [1, 0.8, 0.9, 0.7, 1],
+      textShadow: [
+        "0 0 10px rgba(79, 70, 229, 0.5), 0 0 20px rgba(79, 70, 229, 0.3)",
+        "0 0 15px rgba(79, 70, 229, 0.6), 0 0 25px rgba(79, 70, 229, 0.4)",
+        "0 0 10px rgba(79, 70, 229, 0.5), 0 0 20px rgba(79, 70, 229, 0.3)",
+      ],
       transition: {
         duration: 0.5,
         repeat: Infinity,
@@ -210,25 +212,9 @@ const NotFoundPage = () => {
     },
   };
 
-  const digit4Variants = {
-    initial: { rotateY: 0 },
-    animate: {
-      rotateY: [0, 90, 180, 270, 360],
-      transition: {
-        duration: 2,
-        ease: "easeInOut",
-        repeat: Infinity,
-        repeatDelay: 5,
-        delay: 0.6,
-      },
-    },
-  };
-
   return (
     <div
-      className={`min-h-screen relative overflow-hidden flex items-center justify-center ${
-        isDarkMode ? "bg-gray-900" : "bg-gray-50"
-      }`}
+      className="min-h-screen relative overflow-hidden flex items-center justify-center bg-gray-900"
       ref={containerRef}
       onMouseMove={handleMouseMove}
     >
@@ -237,13 +223,7 @@ const NotFoundPage = () => {
         className="absolute inset-0 w-full h-full"
       />
 
-      <div
-        className={`absolute inset-0 bg-gradient-to-br ${
-          isDarkMode
-            ? "from-gray-900/50 via-transparent to-indigo-900/20"
-            : "from-white/50 via-transparent to-indigo-100/30"
-        }`}
-      />
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900/50 via-transparent to-indigo-900/30" />
 
       <AnimatePresence>
         <motion.div
@@ -255,19 +235,15 @@ const NotFoundPage = () => {
         >
           <motion.div
             variants={itemVariants}
-            className="mb-8 flex justify-center"
+            className="mb-10 flex justify-center"
           >
             <div className="relative">
               <div className="flex items-center justify-center">
                 <motion.div
                   variants={digit1Variants}
-                  className={`text-8xl md:text-9xl font-bold transform-gpu ${
-                    isDarkMode ? "text-indigo-500" : "text-indigo-600"
-                  }`}
+                  className="text-8xl md:text-9xl font-bold transform-gpu text-indigo-500"
                   style={{
-                    textShadow: isDarkMode
-                      ? "0 0 15px rgba(99, 102, 241, 0.5)"
-                      : "0 0 10px rgba(99, 102, 241, 0.3)",
+                    textShadow: "0 0 20px rgba(99, 102, 241, 0.6)",
                   }}
                 >
                   4
@@ -275,13 +251,9 @@ const NotFoundPage = () => {
 
                 <motion.div
                   variants={digit2Variants}
-                  className={`text-8xl md:text-9xl font-bold transform-gpu ${
-                    isDarkMode ? "text-indigo-500" : "text-indigo-600"
-                  }`}
+                  className="text-8xl md:text-9xl font-bold transform-gpu text-indigo-500"
                   style={{
-                    textShadow: isDarkMode
-                      ? "0 0 15px rgba(99, 102, 241, 0.5)"
-                      : "0 0 10px rgba(99, 102, 241, 0.3)",
+                    textShadow: "0 0 20px rgba(99, 102, 241, 0.6)",
                   }}
                 >
                   0
@@ -289,13 +261,9 @@ const NotFoundPage = () => {
 
                 <motion.div
                   variants={digit3Variants}
-                  className={`text-8xl md:text-9xl font-bold transform-gpu ${
-                    isDarkMode ? "text-indigo-500" : "text-indigo-600"
-                  }`}
+                  className="text-8xl md:text-9xl font-bold transform-gpu text-indigo-500"
                   style={{
-                    textShadow: isDarkMode
-                      ? "0 0 15px rgba(99, 102, 241, 0.5)"
-                      : "0 0 10px rgba(99, 102, 241, 0.3)",
+                    textShadow: "0 0 20px rgba(99, 102, 241, 0.6)",
                   }}
                 >
                   4
@@ -303,7 +271,7 @@ const NotFoundPage = () => {
               </div>
 
               <motion.div
-                className="absolute -bottom-4 left-0 right-0 h-1 bg-indigo-500"
+                className="absolute -bottom-4 left-0 right-0 h-1.5 bg-indigo-500"
                 initial={{ scaleX: 0, originX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ delay: 1.2, duration: 0.8 }}
@@ -313,9 +281,7 @@ const NotFoundPage = () => {
 
           <motion.h1
             variants={itemVariants}
-            className={`text-3xl md:text-4xl font-bold mb-6 ${
-              isDarkMode ? "text-white" : "text-gray-800"
-            }`}
+            className="text-3xl md:text-4xl font-bold mb-6 text-white"
           >
             <motion.span variants={glitchAnimation} animate="animate">
               Page Not Found
@@ -324,15 +290,13 @@ const NotFoundPage = () => {
 
           <motion.p
             variants={itemVariants}
-            className={`text-lg md:text-xl mb-10 max-w-2xl mx-auto ${
-              isDarkMode ? "text-gray-300" : "text-gray-600"
-            }`}
+            className="text-lg md:text-xl mb-10 max-w-2xl mx-auto text-gray-300"
           >
             The page you are looking for might have been removed, had its name
             changed, or is temporarily unavailable.
           </motion.p>
 
-          <div className="flex flex-col sm:flex-row justify-center gap-4 md:gap-6 mb-10">
+          <div className="flex flex-col sm:flex-row justify-center gap-6 mb-10">
             <motion.div
               variants={itemVariants}
               whileHover={{ scale: 1.05 }}
@@ -342,15 +306,11 @@ const NotFoundPage = () => {
             >
               <Link
                 to="/"
-                className={`btn ${
-                  isDarkMode
-                    ? "bg-indigo-600 hover:bg-indigo-700"
-                    : "bg-indigo-600 hover:bg-indigo-700"
-                } text-white px-6 py-3 text-lg font-medium rounded-lg transition duration-300 flex items-center justify-center relative overflow-hidden border-2 border-indigo-400 shadow-[0_0_15px_rgba(79,70,229,0.5)]`}
+                className="btn bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 text-lg font-medium rounded-lg transition duration-300 flex items-center justify-center relative overflow-hidden border-2 border-indigo-400 shadow-[0_0_20px_rgba(79,70,229,0.6)]"
               >
                 <span className="relative z-10 text-white tracking-wide flex items-center">
                   <HomeIcon className="w-5 h-5 mr-2" />
-                  Return Home
+                  Return to Dashboard
                 </span>
 
                 <motion.div
@@ -375,11 +335,7 @@ const NotFoundPage = () => {
             >
               <button
                 onClick={() => navigate(-1)}
-                className={`btn ${
-                  isDarkMode
-                    ? "border-indigo-400 bg-indigo-900/40 text-indigo-100 hover:bg-indigo-800/60"
-                    : "border-indigo-600 text-indigo-600 hover:bg-indigo-50"
-                } px-6 py-3 text-lg font-medium rounded-lg transition duration-300 border-2 flex items-center justify-center`}
+                className="btn border-indigo-400 bg-indigo-900/40 text-indigo-100 hover:bg-indigo-800/60 px-6 py-3 text-lg font-medium rounded-lg transition duration-300 border-2 flex items-center justify-center"
               >
                 <ArrowLeftIcon className="w-5 h-5 mr-2" />
                 Go Back
@@ -387,17 +343,12 @@ const NotFoundPage = () => {
             </motion.div>
           </div>
 
-          <motion.div
-            variants={itemVariants}
-            className={`text-sm ${
-              isDarkMode ? "text-gray-400" : "text-gray-500"
-            }`}
-          >
-            Auto-redirecting to home in {countdown} seconds...
+          <motion.div variants={itemVariants} className="text-sm text-gray-400">
+            Auto-redirecting to dashboard in {countdown} seconds...
           </motion.div>
 
           <motion.div
-            className={`mt-4 h-1 bg-gray-200 dark:bg-gray-700 max-w-xs mx-auto rounded-full overflow-hidden`}
+            className="mt-4 h-1 bg-gray-700 max-w-xs mx-auto rounded-full overflow-hidden"
             variants={itemVariants}
           >
             <motion.div
