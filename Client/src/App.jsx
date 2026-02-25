@@ -3,30 +3,51 @@ import './App.css'
 
 // Layouts
 import AppLayout from '@/components/layout/AppLayout'
+import PublicLayout from '@/components/layout/PublicLayout'
 
 // Pages
 import LandingPage from '@/pages/LandingPage'
 import AuthPage from '@/pages/AuthPage'
 import DashboardHome from '@/pages/DashboardHome'
-import AnalysisReport from '@/pages/AnalysisReport'
-import Competitors from '@/pages/Competitors'
+// Engine Pages
+import ContentExtraction from '@/pages/ContentExtraction'
+import SemanticScoring from '@/pages/SemanticScoring'
+import EntityGraph from '@/pages/EntityGraph'
+import AISimulation from '@/pages/AISimulation'
+import CompetitorIntelligence from '@/pages/CompetitorIntelligence'
+import AIStrategyAgent from '@/pages/AIStrategyAgent'
+
+// Resources
+import DataLibrary from '@/pages/DataLibrary'
+import Reports from '@/pages/Reports'
+import Settings from '@/pages/Settings'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/auth" element={<AuthPage />} />
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/auth" element={<AuthPage />} />
+        </Route>
 
         {/* Protected Application Routes (Wrapped in Layout) */}
         <Route path="/dashboard" element={<AppLayout />}>
           <Route index element={<DashboardHome />} />
-          <Route path="analysis" element={<AnalysisReport />} />
-          <Route path="competitors" element={<Competitors />} />
 
-          {/* Settings / Future Routes */}
-          <Route path="settings" element={<div className="p-8 text-center text-muted-foreground">Settings Module Setup</div>} />
+          {/* Engines */}
+          <Route path="extraction" element={<ContentExtraction />} />
+          <Route path="semantic-scoring" element={<SemanticScoring />} />
+          <Route path="knowledge-graph" element={<EntityGraph />} />
+          <Route path="ai-simulation" element={<AISimulation />} />
+          <Route path="competitors" element={<CompetitorIntelligence />} />
+          <Route path="strategy-agent" element={<AIStrategyAgent />} />
+
+          {/* Resources */}
+          <Route path="data-library" element={<DataLibrary />} />
+          <Route path="reports" element={<Reports />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
 
         {/* Catch-all */}
@@ -37,3 +58,4 @@ function App() {
 }
 
 export default App
+
