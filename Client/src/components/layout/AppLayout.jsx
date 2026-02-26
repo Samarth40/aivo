@@ -11,10 +11,13 @@ import {
     FileBarChart, // Reports
     MoreHorizontal, // Settings
     Wand2, // AI Strategy Agent
+    UserCircle, // Profile
+    LogOut, // Logout
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import GlobalHeader from '@/components/layout/GlobalHeader'
 import GlobalFooter from '@/components/layout/GlobalFooter'
+import { useAuth } from '@/contexts/AuthContext'
 
 function SidebarItem({ icon: Icon, label, to, isActive }) {
     return (
@@ -31,9 +34,25 @@ function SidebarItem({ icon: Icon, label, to, isActive }) {
     )
 }
 
+const PAGE_TITLES = {
+    '/dashboard': 'Dashboard',
+    '/dashboard/extraction': 'Content Extraction',
+    '/dashboard/semantic-scoring': 'Semantic Scoring',
+    '/dashboard/knowledge-graph': 'Entity Graph',
+    '/dashboard/ai-simulation': 'AI Simulation',
+    '/dashboard/competitors': 'Competitor Intelligence',
+    '/dashboard/strategy-agent': 'AI Strategy Agent',
+    '/dashboard/data-library': 'Data Library',
+    '/dashboard/reports': 'Reports',
+    '/dashboard/settings': 'Settings',
+    '/dashboard/profile': 'Profile',
+}
+
 export default function AppLayout() {
     const location = useLocation()
     const currentPath = location.pathname
+    const { logout } = useAuth()
+    const pageTitle = PAGE_TITLES[currentPath] || 'Dashboard'
 
     return (
         <div className="flex flex-col min-h-screen w-full bg-background text-foreground">
@@ -69,9 +88,21 @@ export default function AppLayout() {
                             <div className="px-3 text-xs font-semibold text-muted-foreground mb-2">Resources</div>
                             <SidebarItem icon={Database} label="Data Library" to="/dashboard/data-library" isActive={currentPath === '/dashboard/data-library'} />
                             <SidebarItem icon={FileBarChart} label="Reports" to="/dashboard/reports" isActive={currentPath === '/dashboard/reports'} />
+                            <SidebarItem icon={UserCircle} label="Profile" to="/dashboard/profile" isActive={currentPath === '/dashboard/profile'} />
                             <SidebarItem icon={MoreHorizontal} label="Settings" to="/dashboard/settings" isActive={currentPath === '/dashboard/settings'} />
                         </div>
 
+                    </div>
+
+                    {/* Logout button at bottom */}
+                    <div className="p-3 border-t border-border/30">
+                        <button
+                            onClick={logout}
+                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors w-full"
+                        >
+                            <LogOut size={18} />
+                            Log Out
+                        </button>
                     </div>
                 </aside>
 
@@ -79,7 +110,7 @@ export default function AppLayout() {
                 <main className="flex-1 flex flex-col min-w-0 bg-background relative">
                     {/* Dynamic Page Header */}
                     <header className="h-16 flex-shrink-0 flex items-center justify-between px-8 border-b border-transparent">
-                        <h1 className="text-xl font-bold tracking-tight">Documents</h1>
+                        <h1 className="text-xl font-bold tracking-tight">{pageTitle}</h1>
                         <Button variant="secondary" size="sm" className="font-medium bg-card text-foreground rounded-full px-4 h-8 text-xs border shadow-sm">
                             <span className="mr-1.5 text-lg leading-none">+</span> Quick Create
                         </Button>
