@@ -36,6 +36,13 @@ import DataLibrary from '@/pages/DataLibrary'
 import Reports from '@/pages/Reports'
 import Settings from '@/pages/Settings'
 
+// Trust & Corporate Pages (Developer 2)
+import AboutUs from '@/pages/AboutUs'
+import Contact from '@/pages/Contact'
+import TermsOfService from '@/pages/Legal/TermsOfService'
+import PrivacyPolicy from '@/pages/Legal/PrivacyPolicy'
+import CookiePolicy from '@/pages/Legal/CookiePolicy'
+
 function App() {
   return (
     <AuthProvider>
@@ -44,6 +51,11 @@ function App() {
           {/* Public Routes */}
           <Route element={<PublicLayout />}>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/legal/terms" element={<TermsOfService />} />
+            <Route path="/legal/privacy" element={<PrivacyPolicy />} />
+            <Route path="/legal/cookies" element={<CookiePolicy />} />
           </Route>
 
           {/* Auth Routes — guests only (logged-in users get redirected) */}
