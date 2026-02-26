@@ -7,7 +7,7 @@ import {
     Network, // Entity
     Bot, // AI Sim
     Swords, // Competitor
-    Database, // Data Library
+
     FileBarChart, // Reports
     MoreHorizontal, // Settings
     Wand2, // AI Strategy Agent
@@ -31,24 +31,10 @@ function SidebarItem({ icon: Icon, label, to, isActive }) {
     )
 }
 
-const PAGE_TITLES = {
-    '/dashboard': 'Dashboard',
-    '/dashboard/extraction': 'Content Extraction',
-    '/dashboard/semantic-scoring': 'Semantic Scoring',
-    '/dashboard/knowledge-graph': 'Entity Graph',
-    '/dashboard/ai-simulation': 'AI Simulation',
-    '/dashboard/competitors': 'Competitor Intelligence',
-    '/dashboard/strategy-agent': 'AI Strategy Agent',
-    '/dashboard/data-library': 'Data Library',
-    '/dashboard/reports': 'Reports',
-    '/dashboard/settings': 'Settings',
-    '/dashboard/profile': 'Profile',
-}
 
 export default function AppLayout() {
     const location = useLocation()
     const currentPath = location.pathname
-    const pageTitle = PAGE_TITLES[currentPath] || 'Dashboard'
 
     return (
         <div className="flex flex-col min-h-screen w-full bg-background text-foreground">
@@ -60,7 +46,7 @@ export default function AppLayout() {
                     <div className="h-16 flex items-center px-6">
                         <div className="flex items-center gap-2">
                             <div className="w-5 h-5 rounded-full border-2 border-primary" />
-                            <span className="font-semibold text-[15px] tracking-tight">AIVO Inc.</span>
+                            <span className="font-semibold text-[15px] tracking-tight">AIVO</span>
                         </div>
                     </div>
 
@@ -82,7 +68,6 @@ export default function AppLayout() {
                         {/* Resources Group */}
                         <div className="space-y-1 w-full pt-4">
                             <div className="px-3 text-xs font-semibold text-muted-foreground mb-2">Resources</div>
-                            <SidebarItem icon={Database} label="Data Library" to="/dashboard/data-library" isActive={currentPath === '/dashboard/data-library'} />
                             <SidebarItem icon={FileBarChart} label="Reports" to="/dashboard/reports" isActive={currentPath === '/dashboard/reports'} />
                             <SidebarItem icon={MoreHorizontal} label="Settings" to="/dashboard/settings" isActive={currentPath === '/dashboard/settings'} />
                         </div>
@@ -92,13 +77,7 @@ export default function AppLayout() {
 
                 {/* Main Content Area */}
                 <main className="flex-1 flex flex-col min-w-0 bg-background relative">
-                    {/* Dynamic Page Header */}
-                    <header className="h-16 flex-shrink-0 flex items-center justify-between px-8 border-b border-transparent">
-                        <h1 className="text-xl font-bold tracking-tight">{pageTitle}</h1>
-                        <Button variant="secondary" size="sm" className="font-medium bg-card text-foreground rounded-full px-4 h-8 text-xs border shadow-sm">
-                            <span className="mr-1.5 text-lg leading-none">+</span> Quick Create
-                        </Button>
-                    </header>
+
 
                     <div className="flex-1 p-8 pt-2">
                         <div className="mx-auto w-full max-w-[1400px]">
