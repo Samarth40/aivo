@@ -1,13 +1,22 @@
-import React from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 import { useAuth } from '@/contexts/AuthContext'
-import { LogOut, UserCircle } from 'lucide-react'
+import { LogOut, UserCircle, Settings } from 'lucide-react'
 
 export default function GlobalHeader() {
     const { isAuthenticated, user, logout } = useAuth()
     const location = useLocation()
+    const navigate = useNavigate()
     const isDashboard = location.pathname.startsWith('/dashboard')
+    const [showDropdown, setShowDropdown] = useState(false)
+
+    const handleLogout = () => {
+        setShowDropdown(false)
+        logout()
+        navigate('/login')
+    }
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4 pointer-events-none">
@@ -29,31 +38,67 @@ export default function GlobalHeader() {
                 </div>
                 <div className="flex items-center gap-3">
                     {isAuthenticated ? (
-                        <>
-                            <Link
-                                to="/dashboard/profile"
-                                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                            >
+                        <div
+                            className="relative"
+                            onMouseEnter={() => setShowDropdown(true)}
+                            onMouseLeave={() => setShowDropdown(false)}
+                        >
+                            {/* Avatar trigger */}
+                            <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
                                     <span className="text-xs font-bold text-primary">
                                         {user?.name?.[0]?.toUpperCase() || 'U'}
                                     </span>
                                 </div>
-                                {!isDashboard && (
-                                    <span className="hidden lg:inline font-medium">{user?.name || 'User'}</span>
-                                )}
-                            </Link>
-                            {!isDashboard && (
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={logout}
-                                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full"
-                                >
-                                    <LogOut className="w-4 h-4" />
-                                </Button>
+                                <span className="hidden lg:inline font-medium">{user?.name || 'User'}</span>
+                            </button>
+
+                            {/* Hover dropdown */}
+                            {showDropdown && (
+                                <div className="absolute right-0 top-full pt-2">
+                                    <div className="glass rounded-xl border border-white/10 shadow-2xl shadow-black/40 min-w-[220px] py-2 overflow-hidden">
+                                        {/* User info */}
+                                        <div className="px-4 py-2.5">
+                                            <p className="text-sm font-semibold text-foreground">{user?.name || 'User'}</p>
+                                            <p className="text-xs text-muted-foreground truncate">{user?.email || ''}</p>
+                                        </div>
+                                        <Separator className="bg-border/20" />
+
+                                        {/* Menu items */}
+                                        <div className="py-1">
+                                            <Link
+                                                to="/dashboard/profile"
+                                                onClick={() => setShowDropdown(false)}
+                                                className="flex items-center gap-3 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+                                            >
+                                                <UserCircle className="w-4 h-4" />
+                                                Profile
+                                            </Link>
+                                            <Link
+                                                to="/dashboard/settings"
+                                                onClick={() => setShowDropdown(false)}
+                                                className="flex items-center gap-3 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+                                            >
+                                                <Settings className="w-4 h-4" />
+                                                Settings
+                                            </Link>
+                                        </div>
+                                        <Separator className="bg-border/20" />
+
+                                        {/* Logout */}
+                                        <div className="py-1">
+                                            <button
+                                                onClick={handleLogout}
+                                                className="flex items-center gap-3 px-4 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors w-full text-left cursor-pointer"
+                                            >
+                                                <LogOut className="w-4 h-4" />
+                                                Log Out
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             )}
-                        </>
+                        </div>
                     ) : (
                         <Button asChild variant="outline" className="rounded-full bg-transparent border-border hover:bg-white/5 text-white">
                             <Link to="/login">Login</Link>

@@ -11,13 +11,10 @@ import {
     FileBarChart, // Reports
     MoreHorizontal, // Settings
     Wand2, // AI Strategy Agent
-    UserCircle, // Profile
-    LogOut, // Logout
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import GlobalHeader from '@/components/layout/GlobalHeader'
 import GlobalFooter from '@/components/layout/GlobalFooter'
-import { useAuth } from '@/contexts/AuthContext'
 
 function SidebarItem({ icon: Icon, label, to, isActive }) {
     return (
@@ -51,7 +48,6 @@ const PAGE_TITLES = {
 export default function AppLayout() {
     const location = useLocation()
     const currentPath = location.pathname
-    const { logout } = useAuth()
     const pageTitle = PAGE_TITLES[currentPath] || 'Dashboard'
 
     return (
@@ -88,21 +84,9 @@ export default function AppLayout() {
                             <div className="px-3 text-xs font-semibold text-muted-foreground mb-2">Resources</div>
                             <SidebarItem icon={Database} label="Data Library" to="/dashboard/data-library" isActive={currentPath === '/dashboard/data-library'} />
                             <SidebarItem icon={FileBarChart} label="Reports" to="/dashboard/reports" isActive={currentPath === '/dashboard/reports'} />
-                            <SidebarItem icon={UserCircle} label="Profile" to="/dashboard/profile" isActive={currentPath === '/dashboard/profile'} />
                             <SidebarItem icon={MoreHorizontal} label="Settings" to="/dashboard/settings" isActive={currentPath === '/dashboard/settings'} />
                         </div>
 
-                    </div>
-
-                    {/* Logout button at bottom */}
-                    <div className="p-3 border-t border-border/30">
-                        <button
-                            onClick={logout}
-                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors w-full"
-                        >
-                            <LogOut size={18} />
-                            Log Out
-                        </button>
                     </div>
                 </aside>
 
