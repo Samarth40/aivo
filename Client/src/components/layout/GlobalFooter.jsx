@@ -30,9 +30,9 @@ export default function GlobalFooter() {
                         <h6 className="text-white text-sm font-bold mb-6 uppercase tracking-widest">Product</h6>
                         <ul className="space-y-4 text-sm text-muted-foreground">
                             <li><a className="hover:text-white transition-colors" href="/#platform">Platform</a></li>
-                            <li><a className="hover:text-white transition-colors" href="/#solutions">Solutions</a></li>
-                            <li><a className="hover:text-white transition-colors" href="/#pricing">Pricing</a></li>
-                            <li><a className="hover:text-white transition-colors" href="/#articles">Resources</a></li>
+                            <li><Link className="hover:text-white transition-colors" to="/solutions/publishers">Solutions</Link></li>
+                            <li><Link className="hover:text-white transition-colors" to="/pricing">Pricing</Link></li>
+                            <li><Link className="hover:text-white transition-colors" to="/customers">Customers</Link></li>
                         </ul>
                     </div>
                     <div>

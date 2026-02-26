@@ -22,6 +22,14 @@ import DataLibrary from '@/pages/DataLibrary'
 import Reports from '@/pages/Reports'
 import Settings from '@/pages/Settings'
 
+// Growth & Conversion Pages
+import Pricing from '@/pages/Pricing'
+import Customers from '@/pages/Customers'
+import CaseStudyDetail from '@/pages/CaseStudyDetail'
+import Publishers from '@/pages/Solutions/Publishers'
+import Ecommerce from '@/pages/Solutions/Ecommerce'
+import B2BSaas from '@/pages/Solutions/B2BSaas'
+
 function App() {
   return (
     <BrowserRouter>
@@ -30,6 +38,12 @@ function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/customers" element={<Customers />} />
+          <Route path="/customers/:slug" element={<CaseStudyDetail />} />
+          <Route path="/solutions/publishers" element={<Publishers />} />
+          <Route path="/solutions/ecommerce" element={<Ecommerce />} />
+          <Route path="/solutions/b2b-saas" element={<B2BSaas />} />
         </Route>
 
         {/* Protected Application Routes (Wrapped in Layout) */}
