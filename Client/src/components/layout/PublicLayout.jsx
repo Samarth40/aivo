@@ -2,6 +2,7 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 import GlobalHeader from '@/components/layout/GlobalHeader'
 import GlobalFooter from '@/components/layout/GlobalFooter'
+import CookieConsentBanner from '@/components/common/CookieConsentBanner'
 
 export default function PublicLayout() {
     return (
@@ -14,6 +15,7 @@ export default function PublicLayout() {
             </main>
 
             <GlobalFooter />
+            <CookieConsentBanner />
         </div>
     )
 }
