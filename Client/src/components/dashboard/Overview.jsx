@@ -1,59 +1,110 @@
-import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
+import { useEffect, useState } from "react"
+import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts"
 
-const data = [
-    { name: "Jun 24", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "Jun 25", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "Jun 26", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "Jun 27", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "Jun 28", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "Jun 29", total: Math.floor(Math.random() * 5000) + 1000 },
-    { name: "Jun 30", total: Math.floor(Math.random() * 5000) + 1000 },
+const DATA_3M = [
+    { date: "Jan 15", score: 42 },
+    { date: "Jan 22", score: 48 },
+    { date: "Jan 29", score: 45 },
+    { date: "Feb 5", score: 53 },
+    { date: "Feb 12", score: 58 },
+    { date: "Feb 19", score: 61 },
+    { date: "Feb 26", score: 64 },
+    { date: "Mar 5", score: 59 },
+    { date: "Mar 12", score: 67 },
+    { date: "Mar 19", score: 72 },
+    { date: "Mar 26", score: 74 },
+    { date: "Apr 2", score: 71 },
 ]
 
-export function Overview() {
+const DATA_30D = [
+    { date: "Mar 4", score: 59 },
+    { date: "Mar 7", score: 62 },
+    { date: "Mar 10", score: 60 },
+    { date: "Mar 13", score: 65 },
+    { date: "Mar 16", score: 68 },
+    { date: "Mar 19", score: 72 },
+    { date: "Mar 22", score: 70 },
+    { date: "Mar 25", score: 74 },
+    { date: "Mar 28", score: 73 },
+    { date: "Apr 1", score: 71 },
+]
+
+const DATA_7D = [
+    { date: "Mar 27", score: 73 },
+    { date: "Mar 28", score: 72 },
+    { date: "Mar 29", score: 74 },
+    { date: "Mar 30", score: 70 },
+    { date: "Mar 31", score: 71 },
+    { date: "Apr 1", score: 73 },
+    { date: "Apr 2", score: 71 },
+]
+
+const DATASETS = { "3m": DATA_3M, "30d": DATA_30D, "7d": DATA_7D }
+
+function useCSSColor(varName) {
+    const [color, setColor] = useState("#888")
+    useEffect(() => {
+        const raw = getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
+        if (raw) setColor(raw.startsWith("oklch") || raw.startsWith("#") || raw.startsWith("rgb") ? raw : `oklch(${raw})`)
+    }, [varName])
+    return color
+}
+
+export function Overview({ range = "3m" }) {
+    const primaryColor = useCSSColor("--primary")
+    const borderColor = useCSSColor("--border")
+    const mutedFg = useCSSColor("--muted-foreground")
+    const popoverBg = useCSSColor("--popover")
+
+    const data = DATASETS[range] || DATA_3M
+
     return (
-        <ResponsiveContainer width="100%" height={320}>
-            <AreaChart data={data} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
+        <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                 <defs>
-                    <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                    </linearGradient>
-                    {/* A secondary subtle gradient line effect seen in the mockup */}
-                    <linearGradient id="colorOverlay" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#ffffff" stopOpacity={0.2} />
-                        <stop offset="95%" stopColor="#ffffff" stopOpacity={0} />
+                    <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={primaryColor} stopOpacity={0.3} />
+                        <stop offset="95%" stopColor={primaryColor} stopOpacity={0} />
                     </linearGradient>
                 </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke={borderColor} strokeOpacity={0.4} vertical={false} />
                 <XAxis
-                    dataKey="name"
-                    stroke="#888888"
-                    fontSize={12}
+                    dataKey="date"
+                    stroke={mutedFg}
+                    fontSize={11}
                     tickLine={false}
                     axisLine={false}
-                    dy={10}
+                    dy={8}
+                />
+                <YAxis
+                    stroke={mutedFg}
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                    domain={[0, 100]}
+                    dx={-8}
+                    tickFormatter={(v) => `${v}`}
                 />
                 <Tooltip
-                    contentStyle={{ backgroundColor: 'hsl(var(--popover))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
-                    itemStyle={{ color: 'hsl(var(--primary))' }}
+                    contentStyle={{
+                        backgroundColor: popoverBg,
+                        borderColor: borderColor,
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                    }}
+                    labelStyle={{ color: mutedFg, fontWeight: 600, marginBottom: 4 }}
+                    itemStyle={{ color: primaryColor }}
+                    formatter={(value) => [`${value}/100`, "AI Visibility Score"]}
                 />
                 <Area
                     type="monotone"
-                    dataKey="total"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={3}
+                    dataKey="score"
+                    stroke={primaryColor}
+                    strokeWidth={2.5}
                     fillOpacity={1}
-                    fill="url(#colorTotal)"
-                />
-                {/* Simulate the double wave in the mockup by drawing a second area slightly offset */}
-                <Area
-                    type="monotone"
-                    dataKey={(d) => d.total * 0.6}
-                    stroke="#ffffff"
-                    strokeOpacity={0.5}
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#colorOverlay)"
+                    fill="url(#scoreGradient)"
+                    dot={false}
+                    activeDot={{ r: 5, strokeWidth: 2, stroke: popoverBg }}
                 />
             </AreaChart>
         </ResponsiveContainer>
