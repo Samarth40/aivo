@@ -2,15 +2,13 @@ import React from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import {
     LayoutDashboard,
-    Scissors, // Extraction
-    BrainCircuit, // Semantic
-    Network, // Entity
+    Workflow, // Analysis Pipeline
     Bot, // AI Sim
     Swords, // Competitor
 
     FileBarChart, // Reports
     MoreHorizontal, // Settings
-    Wand2, // AI Strategy Agent
+    FileText, // LLMs.txt Generator
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import GlobalHeader from '@/components/layout/GlobalHeader'
@@ -57,12 +55,10 @@ export default function AppLayout() {
                         <div className="space-y-1 w-full">
                             <div className="px-3 text-xs font-semibold text-muted-foreground mb-2">Engines</div>
                             <SidebarItem icon={LayoutDashboard} label="Dashboard" to="/dashboard" isActive={currentPath === '/dashboard' || currentPath === '/'} />
-                            <SidebarItem icon={Scissors} label="Content Extraction" to="/dashboard/extraction" isActive={currentPath === '/dashboard/extraction'} />
-                            <SidebarItem icon={BrainCircuit} label="Semantic Scoring" to="/dashboard/semantic-scoring" isActive={currentPath === '/dashboard/semantic-scoring'} />
-                            <SidebarItem icon={Network} label="Entity Graph" to="/dashboard/knowledge-graph" isActive={currentPath === '/dashboard/knowledge-graph'} />
+                            <SidebarItem icon={Workflow} label="Analysis Pipeline" to="/dashboard/analysis" isActive={currentPath === '/dashboard/analysis'} />
                             <SidebarItem icon={Bot} label="AI Simulation" to="/dashboard/ai-simulation" isActive={currentPath === '/dashboard/ai-simulation'} />
                             <SidebarItem icon={Swords} label="Competitor Data" to="/dashboard/competitors" isActive={currentPath === '/dashboard/competitors'} />
-                            <SidebarItem icon={Wand2} label="AI Strategy Agent" to="/dashboard/strategy-agent" isActive={currentPath === '/dashboard/strategy-agent'} />
+                            <SidebarItem icon={FileText} label="LLMs.txt Generator" to="/dashboard/llms-generator" isActive={currentPath === '/dashboard/llms-generator'} />
                         </div>
 
                         {/* Resources Group */}

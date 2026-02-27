@@ -24,12 +24,10 @@ import OnboardingPage from '@/pages/OnboardingPage'
 import ProfilePage from '@/pages/ProfilePage'
 import DashboardHome from '@/pages/DashboardHome'
 // Engine Pages
-import ContentExtraction from '@/pages/ContentExtraction'
-import SemanticScoring from '@/pages/SemanticScoring'
-import EntityGraph from '@/pages/EntityGraph'
+import AnalysisPipeline from '@/pages/AnalysisPipeline'
 import AISimulation from '@/pages/AISimulation'
 import CompetitorIntelligence from '@/pages/CompetitorIntelligence'
-import AIStrategyAgent from '@/pages/AIStrategyAgent'
+import LlmsTxtGenerator from '@/pages/LlmsTxtGenerator'
 
 // Resources
 import DataLibrary from '@/pages/DataLibrary'
@@ -90,12 +88,10 @@ function App() {
             <Route index element={<DashboardHome />} />
 
             {/* Engines */}
-            <Route path="extraction" element={<ContentExtraction />} />
-            <Route path="semantic-scoring" element={<SemanticScoring />} />
-            <Route path="knowledge-graph" element={<EntityGraph />} />
+            <Route path="analysis" element={<AnalysisPipeline />} />
             <Route path="ai-simulation" element={<AISimulation />} />
             <Route path="competitors" element={<CompetitorIntelligence />} />
-            <Route path="strategy-agent" element={<AIStrategyAgent />} />
+            <Route path="llms-generator" element={<LlmsTxtGenerator />} />
 
             {/* Resources */}
             <Route path="data-library" element={<DataLibrary />} />
