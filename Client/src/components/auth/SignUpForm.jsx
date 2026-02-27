@@ -289,9 +289,9 @@ export default function SignUpForm() {
 
                         <p className="text-[11px] text-muted-foreground/60 text-center leading-relaxed">
                             By signing up, you agree to our{' '}
-                            <a href="#" className="text-primary/70 hover:text-primary underline-offset-4 hover:underline">Terms of Service</a>{' '}
+                            <Link to="/legal/terms" className="text-primary/70 hover:text-primary underline-offset-4 hover:underline">Terms of Service</Link>{' '}
                             and{' '}
-                            <a href="#" className="text-primary/70 hover:text-primary underline-offset-4 hover:underline">Privacy Policy</a>.
+                            <Link to="/legal/privacy" className="text-primary/70 hover:text-primary underline-offset-4 hover:underline">Privacy Policy</Link>.
                         </p>
                     </form>
                 </CardContent>
