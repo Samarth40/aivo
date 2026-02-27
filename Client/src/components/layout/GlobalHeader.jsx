@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { LogOut, UserCircle, Settings, ChevronDown, Menu, X } from 'lucide-react'
 
 export default function GlobalHeader() {
-    const { isAuthenticated, user, logout } = useAuth()
+    const { isAuthenticated, user, profile, logout } = useAuth()
     const location = useLocation()
     const navigate = useNavigate()
     const [showDropdown, setShowDropdown] = useState(false)
@@ -92,17 +92,22 @@ export default function GlobalHeader() {
                             onMouseLeave={() => setShowDropdown(false)}
                         >
                             <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
-                                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
-                                    <span className="text-xs font-bold text-primary">
-                                        {user?.name?.[0]?.toUpperCase() || 'U'}
-                                    </span>
-                                </div>
+                                {profile?.avatarUrl ? (
+                                    <img src={profile.avatarUrl} alt="" className="w-8 h-8 rounded-full object-cover border border-primary/30" />
+                                ) : (
+                                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+                                        <span className="text-xs font-bold text-primary">
+                                            {user?.name?.[0]?.toUpperCase() || 'U'}
+                                        </span>
+                                    </div>
+                                )}
                                 <span className="hidden lg:inline font-medium">{user?.name || 'User'}</span>
                             </button>
 
                             {showDropdown && (
                                 <div className="absolute right-0 top-full pt-2">
-                                    <div className="rounded-xl border border-white/10 shadow-2xl shadow-black/50 min-w-[220px] py-2 overflow-hidden bg-[#1a1730]/95 backdrop-blur-xl">
+                                    <div className="rounded-xl border border-border/60 shadow-2xl shadow-black/60 min-w-[220px] py-2 overflow-hidden bg-card/95 backdrop-blur-xl">
+                                        {/* User info */}
                                         <div className="px-4 py-2.5">
                                             <p className="text-sm font-semibold text-foreground">{user?.name || 'User'}</p>
                                             <p className="text-xs text-muted-foreground truncate">{user?.email || ''}</p>
