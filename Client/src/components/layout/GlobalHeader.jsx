@@ -29,9 +29,9 @@ export default function GlobalHeader() {
                 </Link>
                 <div className="hidden md:flex items-center gap-8 text-sm font-medium">
                     <a className="hover:text-primary transition-colors text-muted-foreground" href="/#platform">Platform</a>
-                    <a className="hover:text-primary transition-colors text-muted-foreground" href="/#solutions">Solutions</a>
-                    <a className="hover:text-primary transition-colors text-muted-foreground" href="/#pricing">Pricing</a>
-                    <a className="hover:text-primary transition-colors text-muted-foreground" href="/#articles">Articles</a>
+                    <Link className="hover:text-primary transition-colors text-muted-foreground" to="/solutions/publishers">Solutions</Link>
+                    <Link className="hover:text-primary transition-colors text-muted-foreground" to="/pricing">Pricing</Link>
+                    <Link className="hover:text-primary transition-colors text-muted-foreground" to="/customers">Customers</Link>
                     {isAuthenticated && (
                         <Link to="/dashboard" className="hover:text-primary transition-colors text-muted-foreground font-bold">Dashboard</Link>
                     )}
