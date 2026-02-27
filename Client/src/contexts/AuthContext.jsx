@@ -15,6 +15,7 @@ function getStoredAuth() {
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(() => getStoredAuth()?.user || null)
     const [isOnboarded, setIsOnboarded] = useState(() => getStoredAuth()?.isOnboarded || false)
+    const [twoFactorEnabled, setTwoFactorEnabled] = useState(() => getStoredAuth()?.twoFactorEnabled || false)
     const [isLoading, setIsLoading] = useState(false)
 
     const isAuthenticated = !!user
@@ -22,11 +23,11 @@ export function AuthProvider({ children }) {
     // Persist auth state to localStorage
     useEffect(() => {
         if (user) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({ user, isOnboarded }))
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ user, isOnboarded, twoFactorEnabled }))
         } else {
             localStorage.removeItem(STORAGE_KEY)
         }
-    }, [user, isOnboarded])
+    }, [user, isOnboarded, twoFactorEnabled])
 
     const login = useCallback((userData) => {
         const authUser = {
@@ -56,9 +57,15 @@ export function AuthProvider({ children }) {
         console.log('[Auth] Onboarding completed:', onboardingData)
     }, [])
 
+    const toggle2FA = useCallback((enabled) => {
+        setTwoFactorEnabled(enabled)
+        console.log('[Auth] 2FA:', enabled ? 'enabled' : 'disabled')
+    }, [])
+
     const logout = useCallback(() => {
         setUser(null)
         setIsOnboarded(false)
+        setTwoFactorEnabled(false)
         localStorage.removeItem(STORAGE_KEY)
         console.log('[Auth] Logged out')
     }, [])
@@ -68,9 +75,11 @@ export function AuthProvider({ children }) {
         isAuthenticated,
         isOnboarded,
         isLoading,
+        twoFactorEnabled,
         login,
         signup,
         completeOnboarding,
+        toggle2FA,
         logout,
     }
 

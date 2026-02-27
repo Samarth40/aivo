@@ -102,7 +102,7 @@ export default function ForgotPasswordForm() {
                                 </form>
                             </CardContent>
 
-                            <CardFooter className="justify-center pb-6">
+                            <CardFooter className="justify-center pb-6 pt-2">
                                 <Link
                                     to="/login"
                                     className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
