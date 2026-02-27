@@ -3,10 +3,19 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 const AuthContext = createContext(null)
 
 const STORAGE_KEY = 'aivo_auth'
+const PROFILE_KEY = 'aivo_profile'
 
 function getStoredAuth() {
     try {
         const stored = localStorage.getItem(STORAGE_KEY)
+        if (stored) return JSON.parse(stored)
+    } catch { }
+    return null
+}
+
+function getStoredProfile() {
+    try {
+        const stored = localStorage.getItem(PROFILE_KEY)
         if (stored) return JSON.parse(stored)
     } catch { }
     return null
@@ -17,8 +26,27 @@ export function AuthProvider({ children }) {
     const [isOnboarded, setIsOnboarded] = useState(() => getStoredAuth()?.isOnboarded || false)
     const [twoFactorEnabled, setTwoFactorEnabled] = useState(() => getStoredAuth()?.twoFactorEnabled || false)
     const [isLoading, setIsLoading] = useState(false)
+    const [profile, setProfile] = useState(() => getStoredProfile() || {
+        firstName: '',
+        lastName: '',
+        jobTitle: '',
+        bio: '',
+        avatarUrl: '',
+    })
 
     const isAuthenticated = !!user
+
+    // Sync profile firstName/lastName from user on login/signup
+    useEffect(() => {
+        if (user && !getStoredProfile()) {
+            const nameParts = (user.name || '').split(' ')
+            setProfile(prev => ({
+                ...prev,
+                firstName: prev.firstName || nameParts[0] || '',
+                lastName: prev.lastName || nameParts.slice(1).join(' ') || '',
+            }))
+        }
+    }, [user])
 
     // Persist auth state to localStorage
     useEffect(() => {
@@ -29,6 +57,13 @@ export function AuthProvider({ children }) {
         }
     }, [user, isOnboarded, twoFactorEnabled])
 
+    // Persist profile to localStorage
+    useEffect(() => {
+        if (user) {
+            localStorage.setItem(PROFILE_KEY, JSON.stringify(profile))
+        }
+    }, [profile, user])
+
     const login = useCallback((userData) => {
         const authUser = {
             email: userData.email,
@@ -36,7 +71,6 @@ export function AuthProvider({ children }) {
             loggedInAt: new Date().toISOString(),
         }
         setUser(authUser)
-        // If they logged in before, they must have already onboarded
         setIsOnboarded(true)
         console.log('[Auth] Login:', authUser)
     }, [])
@@ -48,7 +82,7 @@ export function AuthProvider({ children }) {
             createdAt: new Date().toISOString(),
         }
         setUser(authUser)
-        setIsOnboarded(false) // New user, must onboard
+        setIsOnboarded(false)
         console.log('[Auth] Signup:', authUser)
     }, [])
 
@@ -62,11 +96,26 @@ export function AuthProvider({ children }) {
         console.log('[Auth] 2FA:', enabled ? 'enabled' : 'disabled')
     }, [])
 
+    const updateProfile = useCallback((updates) => {
+        setProfile(prev => {
+            const updated = { ...prev, ...updates }
+            // Also update user name if firstName/lastName changed
+            if (updates.firstName !== undefined || updates.lastName !== undefined) {
+                const newName = `${updated.firstName} ${updated.lastName}`.trim()
+                setUser(prevUser => prevUser ? { ...prevUser, name: newName } : prevUser)
+            }
+            return updated
+        })
+        console.log('[Auth] Profile updated:', updates)
+    }, [])
+
     const logout = useCallback(() => {
         setUser(null)
         setIsOnboarded(false)
         setTwoFactorEnabled(false)
+        setProfile({ firstName: '', lastName: '', jobTitle: '', bio: '', avatarUrl: '' })
         localStorage.removeItem(STORAGE_KEY)
+        localStorage.removeItem(PROFILE_KEY)
         console.log('[Auth] Logged out')
     }, [])
 
@@ -76,10 +125,12 @@ export function AuthProvider({ children }) {
         isOnboarded,
         isLoading,
         twoFactorEnabled,
+        profile,
         login,
         signup,
         completeOnboarding,
         toggle2FA,
+        updateProfile,
         logout,
     }
 
