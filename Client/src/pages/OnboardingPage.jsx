@@ -336,14 +336,6 @@ export default function OnboardingPage() {
                     </Button>
                 </div>
             </div>
-
-            {/* Skip link */}
-            <button
-                onClick={() => navigate('/dashboard')}
-                className="relative z-10 mt-6 text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors underline-offset-4 hover:underline"
-            >
-                Skip for now
-            </button>
         </div>
     )
 }
