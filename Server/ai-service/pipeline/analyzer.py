@@ -1,7 +1,7 @@
 import json
 import google.generativeai as genai
 
-def analyze_content(page_data, llm_model_name="gemini-1.5-flash"):
+def analyze_content(page_data, llm_model_name="gemini-2.5-flash"):
     """
     Feeds the extracted website text to Gemini to generate the AIVO metrics json.
     """

@@ -1,4 +1,10 @@
 import os
+import sys
+
+# Fix Windows console encoding for emoji/unicode output
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
 # Fix for "TypeError: Metaclasses with custom tp_new are not supported" on Python 3.14+
 os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
@@ -16,13 +22,21 @@ import google.generativeai as genai
 from pipeline.extractor import extract_website_content
 from pipeline.analyzer import analyze_content
 
-load_dotenv(dotenv_path='../.env')
+# Resolve path to Server/.env regardless of CWD
+# worker.py is at: Server/ai-service/worker.py
+# Server/.env is 1 level up: ai-service/ -> Server/.env
+_script_dir = os.path.dirname(os.path.abspath(__file__))
+_env_path = os.path.join(_script_dir, '../.env')
+load_dotenv(dotenv_path=_env_path)
 
 REDIS_URL = os.getenv('REDIS_URL')
 MONGODB_URI = os.getenv('MONGODB_URI')
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
 print("Starting AIVO Python AI Worker...")
+print(f"ENV Check - REDIS_URL: {'OK' if REDIS_URL else 'MISSING'}")
+print(f"ENV Check - MONGODB_URI: {'OK' if MONGODB_URI else 'MISSING'}")
+print(f"ENV Check - GEMINI_API_KEY: {'OK' if GEMINI_API_KEY else 'MISSING'}")
 
 redis_client = None
 mongo_client = None
@@ -30,17 +44,22 @@ db = None
 
 # Initialize Connections
 if not all([REDIS_URL, MONGODB_URI, GEMINI_API_KEY]):
-    print("WARNING: Missing essential environment variables in ../.env")
+    print("WARNING: Missing essential environment variables in Server/.env")
 else:
     try:
         redis_client = redis.from_url(REDIS_URL)
+        # Test Redis connection
+        redis_client.ping()
+
         mongo_client = MongoClient(MONGODB_URI)
-        db = mongo_client.get_database() # Uses the DB specified in MONGODB_URI
+        # Test MongoDB connection
+        mongo_client.admin.command('ping')
+        db = mongo_client.get_database()
         
         genai.configure(api_key=GEMINI_API_KEY)
-        print("✅ Backend Connections initialized successfully.")
+        print("[OK] Backend Connections initialized successfully.")
     except Exception as e:
-        print(f"❌ Error connecting to services: {e}")
+        print(f"[ERROR] Error connecting to services: {e}")
 
 def fail_job(job_id, error_msg):
     print(f"[{job_id}] FAILED: {error_msg}")
@@ -91,7 +110,7 @@ def process_analysis_job(job_data):
                 'completedAt': time.strftime('%Y-%m-%dT%H:%M:%S.000Z', time.gmtime()),
                 'scoreInfo': {
                     'aiVisibilityScore': metrics.get('aiVisibilityScore', 0),
-                    'aiEnginesAnalyzed': 6, # Future enhancement to hit more engines
+                    'aiEnginesAnalyzed': 6,
                     'expectedCitations': metrics.get('expectedCitations', 0)
                 },
                 'semanticDensity': metrics.get('semanticDensity', 0),
@@ -106,7 +125,7 @@ def listen_queue():
         print("Cannot start listening without Redis connection.")
         return
         
-    print("🚀 Worker listening on queue 'aivo_tasks'...")
+    print("Worker listening on queue 'aivo_tasks'... (Ctrl+C to stop)")
     
     # Exponential backoff parameters for Redis drops
     backoff = 1
@@ -119,13 +138,13 @@ def listen_queue():
                 job_data = json.loads(data_bytes)
                 process_analysis_job(job_data)
                 
-            backoff = 1 # Reset backoff on success
+            backoff = 1  # Reset backoff on success
             
         except Exception as e:
             print(f"Error in queue listening loop: {e}")
             traceback.print_exc()
             time.sleep(backoff)
-            backoff = min(backoff * 2, 60) # Capped at 60 seconds
+            backoff = min(backoff * 2, 60)  # Capped at 60 seconds
 
 if __name__ == "__main__":
     listen_queue()

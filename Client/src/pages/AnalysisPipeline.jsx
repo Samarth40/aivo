@@ -111,8 +111,8 @@ export default function AnalysisPipeline() {
                 return
             }
             
-            const { data } = await res.json()
-            const jobId = data.jobId
+            const resData = await res.json()
+            const jobId = resData.analysis._id
             
             // 2. Poll for results
             const pollInterval = setInterval(async () => {
@@ -123,7 +123,7 @@ export default function AnalysisPipeline() {
                     
                     if (pollRes.ok) {
                         const pollData = await pollRes.json()
-                        const status = pollData.data.status
+                        const status = pollData.status
                         
                         // Map backend status to frontend phases
                         if (status === 'Extracting') {
@@ -146,7 +146,7 @@ export default function AnalysisPipeline() {
                             setPhase(PHASE_COMPLETE)
                             
                             // Map actual backend results to the UI
-                            const result = pollData.data
+                            const result = pollData
                             
                             // Fake extraction summary since we didn't save raw text to mongo
                             setExtractionResult({
@@ -175,8 +175,8 @@ export default function AnalysisPipeline() {
                         } else if (status === 'Failed') {
                             clearInterval(pollInterval)
                             setPhase(PHASE_IDLE)
-                            console.error("Analysis failed:", pollData.data.errorMessage)
-                            alert("Analysis Failed: " + pollData.data.errorMessage)
+                            console.error("Analysis failed:", pollData.errorMessage)
+                            alert("Analysis Failed: " + pollData.errorMessage)
                         }
                     }
                 } catch (e) {
