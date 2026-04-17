@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -17,6 +17,7 @@ import {
     Network,
     Quote,
 } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
 
 const RANGES = [
     { key: "3m", label: "3 Months" },
@@ -26,6 +27,30 @@ const RANGES = [
 
 export default function DashboardHome() {
     const [chartRange, setChartRange] = useState("3m")
+    const { getToken } = useAuth()
+    const [stats, setStats] = useState({
+        totalAnalyses: 0,
+        avgScore: 0,
+        domainsTracked: 0
+    })
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const token = await getToken()
+                const res = await fetch("http://localhost:5000/api/user/stats", {
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                if (res.ok) {
+                    const data = await res.json()
+                    setStats(data.stats)
+                }
+            } catch (err) {
+                console.error("Failed to fetch dashboard stats", err)
+            }
+        }
+        fetchStats()
+    }, [getToken])
 
     return (
         <div className="flex-1 space-y-5 animate-in fade-in duration-500">
@@ -34,14 +59,14 @@ export default function DashboardHome() {
                 <Card className="bg-card/40 border-border/40">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-xs font-medium text-muted-foreground">
-                            AI Visibility Score
+                            Average Visibility Score
                         </CardTitle>
                         <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                             <Eye className="w-4 h-4 text-primary" />
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-black tracking-tight">74<span className="text-lg text-muted-foreground font-semibold">/100</span></div>
+                        <div className="text-3xl font-black tracking-tight">{stats.avgScore || 0}<span className="text-lg text-muted-foreground font-semibold">/100</span></div>
                         <div className="flex items-center gap-1.5 mt-2">
                             <Badge variant="outline" className="text-[10px] font-bold text-chart-2 border-chart-2/30 bg-chart-2/5 px-1.5 py-0">
                                 <TrendingUp className="w-3 h-3 mr-0.5" /> +8.2%
@@ -62,7 +87,7 @@ export default function DashboardHome() {
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-black tracking-tight">128</div>
+                        <div className="text-3xl font-black tracking-tight">{stats.totalAnalyses || 0}</div>
                         <div className="flex items-center gap-1.5 mt-2">
                             <Badge variant="outline" className="text-[10px] font-bold text-chart-2 border-chart-2/30 bg-chart-2/5 px-1.5 py-0">
                                 <TrendingUp className="w-3 h-3 mr-0.5" /> +23

@@ -81,7 +81,6 @@ export default function AnalysisPipeline() {
     const [isExporting, setIsExporting] = useState(false)
     const { getToken } = useAuth()
 
-    // ─── Run the pipeline ────────────────────────────────────────────
     const handleRunPipeline = useCallback(async () => {
         if (!url) return
 
@@ -91,19 +90,12 @@ export default function AnalysisPipeline() {
         setEntityResult(null)
         setActiveTab("extraction")
 
-        // Phase 1: Content Extraction
+        // Initial phase
         setPhase(PHASE_EXTRACTING)
-
-        const extractedContent = {
-            title: "The Ultimate Guide to Answer Engine Optimization",
-            wordCount: 1420,
-            noiseRemoved: "34%",
-            cleanText: "Answer Engine Optimization (AEO) is the ongoing process of structuring and writing content specifically so that Generative AI models (like ChatGPT, Gemini, and Perplexity) will cite and paraphrase it directly in their answers.\n\nUnlike traditional SEO which focuses on ten blue links, AEO focuses entirely on the synthesis of factual entities. To succeed, content must be dense in facts, devoid of promotional marketing fluff, and structured logically using clear H2s and bulleted lists.\n\nThe core of AEO relies on ensuring your Knowledge Graph is populated with your brand's specific terminology and entities. By treating your website as a raw data API designed for LLMs, you vastly increase the likelihood of inclusion in AI Overviews.",
-            elementsStripped: ["Global Navbar", "Cookie Consent Banner", "Sidebar Advertisements (3)", "Footer Links"],
-        }
         
         try {
             const token = await getToken()
+            // 1. Kick off analysis
             const res = await fetch("http://localhost:5000/api/analyze", {
                 method: "POST",
                 headers: {
@@ -112,64 +104,90 @@ export default function AnalysisPipeline() {
                 },
                 body: JSON.stringify({ url })
             })
-            if (res.ok) {
-                const data = await res.json()
-                console.log("Analysis job successfully enqueued:", data)
-            } else {
-                console.error("Failed to enqueue analysis job:", res.status, res.statusText)
+            
+            if (!res.ok) {
+                console.error("Failed to enqueue analysis job")
+                setPhase(PHASE_IDLE)
+                return
             }
+            
+            const resData = await res.json()
+            const jobId = resData.analysis._id
+            
+            // 2. Poll for results
+            const pollInterval = setInterval(async () => {
+                try {
+                    const pollRes = await fetch(`http://localhost:5000/api/analyze/${jobId}`, {
+                        headers: { "Authorization": `Bearer ${token}` }
+                    })
+                    
+                    if (pollRes.ok) {
+                        const pollData = await pollRes.json()
+                        const status = pollData.status
+                        
+                        // Map backend status to frontend phases
+                        if (status === 'Extracting') {
+                            setPhase(PHASE_EXTRACTING)
+                        } else if (status === 'Analyzing') {
+                            setPhase(PHASE_SCORING)
+                            
+                            // Provide placeholder while analyzing
+                            if (!extractionResult) {
+                                setExtractionResult({
+                                    title: "Raw Extraction Complete",
+                                    wordCount: "N/A",
+                                    noiseRemoved: "Cleaned",
+                                    cleanText: "HTML text extracted. Generating AIVO semantic metrics... Please wait.",
+                                    elementsStripped: ["Noise", "Scripts", "Nav"]
+                                })
+                            }
+                        } else if (status === 'Completed') {
+                            clearInterval(pollInterval)
+                            setPhase(PHASE_COMPLETE)
+                            
+                            // Map actual backend results to the UI
+                            const result = pollData
+                            
+                            // Fake extraction summary since we didn't save raw text to mongo
+                            setExtractionResult({
+                                title: url,
+                                wordCount: "Analyzed",
+                                noiseRemoved: "HTML Cleaned",
+                                cleanText: "Semantic Analysis Complete. SEO metrics have been fully retrieved from the AIVO backend Engine.",
+                                elementsStripped: []
+                            })
+                            
+                            setScoringResult({
+                                overallScore: result.scoreInfo?.aiVisibilityScore || 0,
+                                topicMatch: (result.scoreInfo?.expectedCitations || 0) * 10,
+                                comprehensiveness: (result.semanticDensity || 0) * 10,
+                                missingSubtopics: [],
+                                strongSubtopics: []
+                            })
+                            
+                            const entities = result.entitiesFound || []
+                            setEntityResult({
+                                entitiesFound: entities.length,
+                                relationships: entities.length * 2,
+                                topEntities: entities.map(ent => ({ name: ent, type: "Entity", confidence: "High" })),
+                                graphNodes: entities.map((ent, i) => ({ id: i, label: ent, x: 50 + (i*10), y: 50 + (i*5) }))
+                            })
+                        } else if (status === 'Failed') {
+                            clearInterval(pollInterval)
+                            setPhase(PHASE_IDLE)
+                            console.error("Analysis failed:", pollData.errorMessage)
+                            alert("Analysis Failed: " + pollData.errorMessage)
+                        }
+                    }
+                } catch (e) {
+                    console.error("Polling error", e)
+                }
+            }, 2000)
+
         } catch (err) {
             console.error("Error communicating with API Gateway:", err)
+            setPhase(PHASE_IDLE)
         }
-
-        setTimeout(() => {
-            setExtractionResult(extractedContent)
-
-            // Phase 2: Semantic Scoring + Entity Graph in parallel
-            setPhase(PHASE_SCORING)
-
-            // Semantic scoring completes
-            setTimeout(() => {
-                setScoringResult({
-                    overallScore: 84,
-                    topicMatch: 92,
-                    comprehensiveness: 76,
-                    missingSubtopics: [
-                        "Zero-Click Searches",
-                        "Knowledge Panel Integration",
-                        "Voice Search Impact"
-                    ],
-                    strongSubtopics: [
-                        "Generative Engine Algorithms",
-                        "Entity Structuring",
-                        "LLM Hallucinations"
-                    ]
-                })
-            }, 1000)
-
-            // Entity graph completes
-            setTimeout(() => {
-                setEntityResult({
-                    entitiesFound: 14,
-                    relationships: 8,
-                    topEntities: [
-                        { name: "Answer Engine Optimization", type: "Concept", confidence: "98%" },
-                        { name: "Google AI Overviews", type: "Product", confidence: "95%" },
-                        { name: "Knowledge Graph", type: "Technology", confidence: "91%" },
-                        { name: "Large Language Models", type: "Concept", confidence: "88%" },
-                        { name: "Brand Authority", type: "Metric", confidence: "82%" },
-                    ],
-                    graphNodes: [
-                        { id: 1, label: "AEO", x: 50, y: 50 },
-                        { id: 2, label: "LLMs", x: 20, y: 30 },
-                        { id: 3, label: "Google", x: 80, y: 30 },
-                        { id: 4, label: "Knowledge", x: 50, y: 80 },
-                    ]
-                })
-                setPhase(PHASE_COMPLETE)
-            }, 1800)
-
-        }, 1500)
     }, [url, getToken])
 
     // ─── Export all results as PDF ──────────────────────────────────

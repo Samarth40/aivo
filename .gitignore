@@ -1,0 +1,39 @@
+# Environment Variables (NEVER commit these)
+.env
+.env.local
+.env.production
+.env.*
+
+# Node
+node_modules/
+dist/
+build/
+.npm
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Logs
+logs/
+*.log
+error.log
+auth-debug.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Temp / debug scripts
+Server/gateway/test-redis.js
