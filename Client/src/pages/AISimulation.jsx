@@ -245,8 +245,9 @@ export default function AISimulation() {
 
             const pollInterval = setInterval(async () => {
                 try {
+                    const freshToken = await getToken()  // fresh token every poll
                     const pollRes = await fetch(`http://localhost:5000/api/simulate/${jobId}`, {
-                        headers: { "Authorization": `Bearer ${token}` }
+                        headers: { "Authorization": `Bearer ${freshToken}` }
                     })
                     
                     if (pollRes.ok) {
