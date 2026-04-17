@@ -1,0 +1,5 @@
+redis==5.0.4
+pymongo==4.7.0
+beautifulsoup4==4.12.3
+google-generativeai==0.5.3
+python-dotenv==1.0.1
