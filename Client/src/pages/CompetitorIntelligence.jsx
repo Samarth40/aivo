@@ -14,6 +14,8 @@ import {
 } from "lucide-react"
 import { motion } from "motion/react"
 
+import { useAuth } from "@/contexts/AuthContext"
+
 // --- Simulated data ---
 const generateComparison = (targetUrl, competitorUrl) => {
     const getDomain = (u) => {
@@ -114,19 +116,81 @@ function downloadReport(comparison) {
 
 // --- Component ---
 export default function CompetitorIntelligence() {
+    const { getToken } = useAuth()
     const [targetUrl, setTargetUrl] = useState("")
     const [competitorUrl, setCompetitorUrl] = useState("")
     const [isAnalyzing, setIsAnalyzing] = useState(false)
     const [comparison, setComparison] = useState(null)
+    const [errorMsg, setErrorMsg] = useState(null)
 
-    const handleAnalyze = () => {
+    const getDomain = (u) => {
+        try { return new URL(u.startsWith("http") ? u : `https://${u}`).hostname } catch { return u }
+    }
+
+    const handleAnalyze = async () => {
         if (!targetUrl.trim() || !competitorUrl.trim()) return
         setIsAnalyzing(true)
         setComparison(null)
-        setTimeout(() => {
-            try { setComparison(generateComparison(targetUrl, competitorUrl)) } catch { /* ignore */ }
+        setErrorMsg(null)
+        
+        try {
+            const token = await getToken()
+            const res = await fetch("http://localhost:5000/api/competitor", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ targetUrl, competitorUrl })
+            })
+
+            if (!res.ok) {
+                const err = await res.json()
+                setErrorMsg(err.error || "Failed to start analysis")
+                setIsAnalyzing(false)
+                return
+            }
+
+            const data = await res.json()
+            const jobId = data.competitor._id
+
+            const pollInterval = setInterval(async () => {
+                try {
+                    const freshToken = await getToken()
+                    const pollRes = await fetch(`http://localhost:5000/api/competitor/${jobId}`, {
+                        headers: { "Authorization": `Bearer ${freshToken}` }
+                    })
+                    
+                    if (pollRes.ok) {
+                        const pollData = await pollRes.json()
+                        
+                        if (pollData.status === 'Completed') {
+                            clearInterval(pollInterval)
+                            const results = pollData.results
+                            // Ensure domains are attached for the UI
+                            if (results) {
+                                if (results.target) results.target.domain = getDomain(results.target.url || targetUrl)
+                                if (results.competitor) results.competitor.domain = getDomain(results.competitor.url || competitorUrl)
+                                setComparison(results)
+                            }
+                            setIsAnalyzing(false)
+                        } else if (pollData.status === 'Failed') {
+                            clearInterval(pollInterval)
+                            setErrorMsg(pollData.error || "Python worker failed to analyze competitors.")
+                            setIsAnalyzing(false)
+                        }
+                    }
+                } catch (pollErr) {
+                    clearInterval(pollInterval)
+                    setErrorMsg("Lost connection while polling for results.")
+                    setIsAnalyzing(false)
+                }
+            }, 3000)
+
+        } catch (e) {
+            setErrorMsg(e.message)
             setIsAnalyzing(false)
-        }, 2200)
+        }
     }
 
     return (
@@ -178,6 +242,13 @@ export default function CompetitorIntelligence() {
                     </div>
                 </CardContent>
             </Card>
+
+            {/* Error Message */}
+            {errorMsg && (
+                <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm text-center">
+                    {errorMsg}
+                </div>
+            )}
 
             {/* Loading */}
             {isAnalyzing && (

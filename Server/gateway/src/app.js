@@ -28,6 +28,8 @@ import { apiLimiter, heavyTaskLimiter } from './middleware/rateLimiter.js';
 import { startAnalysis, getAnalysisResult } from './controllers/analysis.controller.js';
 import { getDashboardStats, syncUser } from './controllers/user.controller.js';
 import { startSimulation, getSimulationResult } from './controllers/simulation.controller.js';
+import { startCompetitorAnalysis, getCompetitorResult } from './controllers/competitor.controller.js';
+import { startLlmsGeneration, getLlmsResult } from './controllers/llmstxt.controller.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -46,9 +48,13 @@ app.use(clerkMiddleware({
   publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
 }));
 
-// General API Rate Limiting (exclude analyze endpoint)
+// General API Rate Limiting (exclude heavy analysis endpoints)
 app.use('/api', (req, res, next) => {
-  if (req.path.startsWith('/analyze') || req.path.startsWith('/simulate')) return next();
+  const isHeavyTask = req.path.startsWith('/analyze') || 
+                      req.path.startsWith('/simulate') || 
+                      req.path.startsWith('/competitor') || 
+                      req.path.startsWith('/llmstxt');
+  if (isHeavyTask) return next();
   return apiLimiter(req, res, next);
 });
 
@@ -82,6 +88,14 @@ app.get('/api/analyze/:id', checkAuth, getAnalysisResult);
 app.post('/api/simulate', checkAuth, startSimulation);
 app.get('/api/simulate/:id', checkAuth, getSimulationResult);
 
+// Competitor Intelligence Routes
+app.post('/api/competitor', checkAuth, heavyTaskLimiter, startCompetitorAnalysis);
+app.get('/api/competitor/:id', checkAuth, getCompetitorResult);
+
+// LLMs.txt Generation Routes
+app.post('/api/llmstxt', checkAuth, heavyTaskLimiter, startLlmsGeneration);
+app.get('/api/llmstxt/:id', checkAuth, getLlmsResult);
+
 // Global Error Handler (must be last)
 app.use(errorHandler);
 
@@ -94,7 +108,7 @@ if (!process.env.MONGODB_URI) {
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('✅ Connected to MongoDB via Mongoose');
-    app.listen(PORT, '0.0.0.0', () => console.log(`🚀 API Gateway running on port ${PORT}`));
+    app.listen(PORT, () => console.log(`🚀 API Gateway running on port ${PORT}`));
   })
   .catch(err => {
     console.error('❌ MongoDB connection error:', err);
