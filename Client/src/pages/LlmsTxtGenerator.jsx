@@ -11,7 +11,7 @@ import {
     Globe, Tag, Layers, Zap, Search, Pencil
 } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
-
+import { useAuth } from "@/contexts/AuthContext"
 // ─── Helpers ─────────────────────────────────────────────────────────
 const createSection = (title = "", links = [{ label: "", url: "" }]) => ({
     id: crypto.randomUUID(),
@@ -80,10 +80,12 @@ function generateMockData(url) {
 // ═══════════════════════════════════════════════════════════════════════
 
 export default function LlmsTxtGenerator() {
-    // ─── Phase State ─────────────────────────────────────────────────
-    const [phase, setPhase] = useState("input") // "input" | "crawling" | "editing"
+    const { getToken } = useAuth()
+    // ─── Phase State ──────────────────────────────────────────
+    const [phase, setPhase] = useState("input") // "input" | "crawling" | "editing" | "error"
     const [url, setUrl] = useState("")
     const [crawlStep, setCrawlStep] = useState(0)
+    const [errorMsg, setErrorMsg] = useState(null)
 
     // ─── Form State (editable after crawl) ───────────────────────────
     const [brandName, setBrandName] = useState("")
@@ -118,30 +120,85 @@ export default function LlmsTxtGenerator() {
     }, [brandName, tagline, description, sections])
 
     // ─── Crawl & Generate ────────────────────────────────────────────
-    const handleGenerate = useCallback(() => {
+    const handleGenerate = useCallback(async () => {
         if (!url.trim()) return
 
         setPhase("crawling")
         setCrawlStep(0)
+        setErrorMsg(null)
 
-        // Step through crawl phases with cumulative delay
+        // Keep mock UI steps animating
         let totalDelay = 0
         CRAWL_STEPS.forEach((step, idx) => {
             totalDelay += step.duration
             setTimeout(() => setCrawlStep(idx + 1), totalDelay)
         })
 
-        // After all steps complete, populate form data
-        setTimeout(() => {
-            const data = generateMockData(url)
-            setBrandName(data.brandName)
-            setDomain(data.domain)
-            setTagline(data.tagline)
-            setDescription(data.description)
-            setSections(data.sections)
-            setPhase("editing")
-        }, totalDelay + 500)
-    }, [url])
+        try {
+            const token = await getToken()
+            const res = await fetch("http://localhost:5000/api/llmstxt", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ url })
+            })
+
+            if (!res.ok) {
+                const errData = await res.json()
+                setErrorMsg(errData.error || "Failed to enqueue llms.txt generation request")
+                setPhase("error")
+                return
+            }
+
+            const data = await res.json()
+            const jobId = data.job._id
+
+            // Poll the backend
+            const pollInterval = setInterval(async () => {
+                try {
+                    const freshToken = await getToken()
+                    const pollRes = await fetch(`http://localhost:5000/api/llmstxt/${jobId}`, {
+                        headers: { "Authorization": `Bearer ${freshToken}` }
+                    })
+                    
+                    if (pollRes.ok) {
+                        const pollData = await pollRes.json()
+                        const status = pollData.status
+
+                        if (status === 'Crawling') setCrawlStep(1)
+                        if (status === 'Generating') setCrawlStep(3)
+
+                        if (status === 'Completed') {
+                            clearInterval(pollInterval)
+                            const results = pollData.results
+                            if (results) {
+                                setBrandName(results.brandName || "")
+                                setDomain(results.domain || url)
+                                setTagline(results.tagline || "")
+                                setDescription(results.description || "")
+                                setSections(results.sections || [])
+                            }
+                            setPhase("editing")
+                        } else if (status === 'Failed') {
+                            clearInterval(pollInterval)
+                            setErrorMsg(pollData.error || "Worker failed to generate llms.txt")
+                            setPhase("error")
+                        }
+                    }
+                } catch (pollErr) {
+                    clearInterval(pollInterval)
+                    setErrorMsg("Lost connection while polling for results.")
+                    setPhase("error")
+                }
+            }, 3000)
+
+        } catch (e) {
+            setErrorMsg(e.message)
+            setPhase("error")
+        }
+    }, [url, getToken])
 
     // ─── Section Handlers ────────────────────────────────────────────
     const addSection = useCallback(() => {
@@ -282,6 +339,21 @@ export default function LlmsTxtGenerator() {
             {/* ════════════════════════════════════════════════════════
                 PHASE: CRAWLING — animated progress
             ════════════════════════════════════════════════════════ */}
+            {/* error component */}
+            {phase === "error" && (
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col items-center justify-center py-20 space-y-4 text-destructive"
+                >
+                    <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center">
+                        <Info className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-xl font-bold">Generation Failed</h3>
+                    <p className="text-sm opacity-80 max-w-sm text-center">{errorMsg}</p>
+                </motion.div>
+            )}
+
             {phase === "crawling" && (
                 <motion.div
                     initial={{ opacity: 0, y: 10 }}

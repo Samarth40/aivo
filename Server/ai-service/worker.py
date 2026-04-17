@@ -22,6 +22,8 @@ import google.generativeai as genai
 from pipeline.extractor import extract_website_content
 from pipeline.analyzer import analyze_content
 from pipeline.simulator import run_simulation
+from pipeline.competitor import run_competitor_analysis
+from pipeline.llmstxt import run_llmstxt_generation
 
 # Resolve path to Server/.env regardless of CWD
 # worker.py is at: Server/ai-service/worker.py
@@ -180,6 +182,107 @@ def process_simulation_job(job_data):
 
 
 
+def process_competitor_job(job_data):
+    job_id = job_data.get('jobId')
+    target_url = job_data.get('targetUrl')
+    competitor_url = job_data.get('competitorUrl')
+
+    print(f"\n--- Starting Competitor Job: {job_id} ---")
+
+    if db is not None:
+        db.competitors.update_one({'_id': ObjectId(job_id)}, {'$set': {'status': 'Extracting'}})
+
+    # Extract both pages
+    print(f"[{job_id}] Extracting target: {target_url}")
+    target_ext = extract_website_content(target_url)
+    if not target_ext['success']:
+        err = f"Target extraction failed: {target_ext.get('error')}"
+        print(f"[{job_id}] FAILED: {err}")
+        if db is not None:
+            db.competitors.update_one({'_id': ObjectId(job_id)}, {'$set': {'status': 'Failed', 'error': err}})
+        return
+
+    print(f"[{job_id}] Extracting competitor: {competitor_url}")
+    comp_ext = extract_website_content(competitor_url)
+    if not comp_ext['success']:
+        err = f"Competitor extraction failed: {comp_ext.get('error')}"
+        print(f"[{job_id}] FAILED: {err}")
+        if db is not None:
+            db.competitors.update_one({'_id': ObjectId(job_id)}, {'$set': {'status': 'Failed', 'error': err}})
+        return
+
+    if db is not None:
+        db.competitors.update_one({'_id': ObjectId(job_id)}, {'$set': {'status': 'Analyzing'}})
+
+    print(f"[{job_id}] Running Gemini competitor analysis...")
+    result = run_competitor_analysis(
+        target_ext['mainTextChunk'],
+        comp_ext['mainTextChunk'],
+        target_url,
+        competitor_url
+    )
+
+    if not result['success']:
+        err = f"AI analysis failed: {result.get('error')}"
+        print(f"[{job_id}] FAILED: {err}")
+        if db is not None:
+            db.competitors.update_one({'_id': ObjectId(job_id)}, {'$set': {'status': 'Failed', 'error': err}})
+        return
+
+    if db is not None:
+        db.competitors.update_one(
+            {'_id': ObjectId(job_id)},
+            {'$set': {'status': 'Completed', 'results': result['data']}}
+        )
+    print(f"[{job_id}] Competitor Job Complete!")
+
+
+def process_llmstxt_job(job_data):
+    job_id = job_data.get('jobId')
+    url = job_data.get('url')
+
+    print(f"\n--- Starting LLMs.txt Job: {job_id} [{url}] ---")
+
+    if db is not None:
+        db.llmstxts.update_one({'_id': ObjectId(job_id)}, {'$set': {'status': 'Crawling'}})
+
+    print(f"[{job_id}] Crawling: {url}")
+    ext_result = extract_website_content(url)
+    if not ext_result['success']:
+        err = f"Crawl failed: {ext_result.get('error')}"
+        print(f"[{job_id}] FAILED: {err}")
+        if db is not None:
+            db.llmstxts.update_one({'_id': ObjectId(job_id)}, {'$set': {'status': 'Failed', 'error': err}})
+        return
+
+    if db is not None:
+        db.llmstxts.update_one({'_id': ObjectId(job_id)}, {'$set': {'status': 'Generating'}})
+
+    print(f"[{job_id}] Generating llms.txt via Gemini...")
+    result = run_llmstxt_generation(ext_result['mainTextChunk'], url)
+
+    if not result['success']:
+        err = f"Generation failed: {result.get('error')}"
+        print(f"[{job_id}] FAILED: {err}")
+        if db is not None:
+            db.llmstxts.update_one({'_id': ObjectId(job_id)}, {'$set': {'status': 'Failed', 'error': err}})
+        return
+
+    # Add unique IDs to sections so the frontend can use them
+    import uuid
+    data = result['data']
+    for section in data.get('sections', []):
+        section['id'] = str(uuid.uuid4())
+        section['isOpen'] = True
+
+    if db is not None:
+        db.llmstxts.update_one(
+            {'_id': ObjectId(job_id)},
+            {'$set': {'status': 'Completed', 'results': data}}
+        )
+    print(f"[{job_id}] LLMs.txt Job Complete!")
+
+
 def listen_queue():
     if not redis_client:
         print("Cannot start listening without Redis connection.")
@@ -200,6 +303,10 @@ def listen_queue():
                 job_type = job_data.get('type', 'analysis')
                 if job_type == 'simulation':
                     process_simulation_job(job_data)
+                elif job_type == 'competitor':
+                    process_competitor_job(job_data)
+                elif job_type == 'llmstxt':
+                    process_llmstxt_job(job_data)
                 else:
                     process_analysis_job(job_data)
                 
