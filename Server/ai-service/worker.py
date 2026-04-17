@@ -21,6 +21,7 @@ import google.generativeai as genai
 # Pipeline Modules
 from pipeline.extractor import extract_website_content
 from pipeline.analyzer import analyze_content
+from pipeline.simulator import run_simulation
 
 # Resolve path to Server/.env regardless of CWD
 # worker.py is at: Server/ai-service/worker.py
@@ -120,6 +121,65 @@ def process_analysis_job(job_data):
     print(f"[{job_id}] Job Complete!")
 
 
+def process_simulation_job(job_data):
+    job_id = job_data.get('jobId')
+    url = job_data.get('url')
+    content = job_data.get('content')
+    selected_models = job_data.get('selectedModels', [])
+    
+    print(f"\n--- Starting Simulation Job: {job_id} ---")
+    
+    if db is not None:
+        db.simulations.update_one({'_id': ObjectId(job_id)}, {'$set': {'status': 'Extracting/Analyzing'}})
+
+    # 1. Gather Content
+    if url and not content:
+        print(f"[{job_id}] Sim-Step 1: Extracting URL HTML Content...")
+        ext_result = extract_website_content(url)
+        if not ext_result['success']:
+            error_msg = f"Extraction failed: {ext_result.get('error')}"
+            print(f"[{job_id}] FAILED: {error_msg}")
+            if db is not None:
+                db.simulations.update_one({'_id': ObjectId(job_id)}, {'$set': {'status': 'Failed', 'error': error_msg}})
+            return
+        content = ext_result['mainTextChunk']
+    elif content:
+        print(f"[{job_id}] Sim-Step 1: Using provided raw content...")
+    else:
+        error_msg = "No URL or content provided"
+        if db is not None:
+            db.simulations.update_one({'_id': ObjectId(job_id)}, {'$set': {'status': 'Failed', 'error': error_msg}})
+        return
+        
+    if db is not None:
+        db.simulations.update_one({'_id': ObjectId(job_id)}, {'$set': {'status': 'Simulating LLMs'}})
+
+    # 2. Run Gemini Multi-Model Simulator
+    print(f"[{job_id}] Sim-Step 2: Simulating {len(selected_models)} LLM engines natively via Gemini 2.5 Flash...")
+    sim_result = run_simulation(content, selected_models)
+    
+    if not sim_result['success']:
+        error_msg = f"AI Simulation failed: {sim_result.get('error')}"
+        print(f"[{job_id}] FAILED: {error_msg}")
+        if db is not None:
+            db.simulations.update_one({'_id': ObjectId(job_id)}, {'$set': {'status': 'Failed', 'error': error_msg}})
+        return
+
+    # 3. Save Final Simulation JSON to DB
+    print(f"[{job_id}] Sim-Step 3: Saving results to simulations MongoDB...")
+    
+    if db is not None:
+        db.simulations.update_one(
+            {'_id': ObjectId(job_id)},
+            {'$set': {
+                'status': 'Completed',
+                'results': sim_result['data']
+            }}
+        )
+    print(f"[{job_id}] Simulation Job Complete!")
+
+
+
 def listen_queue():
     if not redis_client:
         print("Cannot start listening without Redis connection.")
@@ -136,7 +196,12 @@ def listen_queue():
             if result:
                 _, data_bytes = result
                 job_data = json.loads(data_bytes)
-                process_analysis_job(job_data)
+                
+                job_type = job_data.get('type', 'analysis')
+                if job_type == 'simulation':
+                    process_simulation_job(job_data)
+                else:
+                    process_analysis_job(job_data)
                 
             backoff = 1  # Reset backoff on success
             

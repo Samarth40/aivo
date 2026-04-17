@@ -27,6 +27,7 @@ import { apiLimiter, heavyTaskLimiter } from './middleware/rateLimiter.js';
 // Import Controllers
 import { startAnalysis, getAnalysisResult } from './controllers/analysis.controller.js';
 import { getDashboardStats, syncUser } from './controllers/user.controller.js';
+import { startSimulation, getSimulationResult } from './controllers/simulation.controller.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -47,7 +48,7 @@ app.use(clerkMiddleware({
 
 // General API Rate Limiting (exclude analyze endpoint)
 app.use('/api', (req, res, next) => {
-  if (req.path.startsWith('/analyze')) return next();
+  if (req.path.startsWith('/analyze') || req.path.startsWith('/simulate')) return next();
   return apiLimiter(req, res, next);
 });
 
@@ -55,7 +56,7 @@ app.use('/api', (req, res, next) => {
 const checkAuth = (req, res, next) => {
   const authState = getAuth(req);
   if (!authState || !authState.userId) {
-    console.warn('⚠️ Unauthorized request to', req.path, '- token:', req.headers.authorization ? 'Present' : 'Missing');
+    console.warn('⚠️ Unauthorized request to', req.path, '- token:', req.headers.authorization ? 'Present' : 'Missing', 'authState:', authState);
     return res.status(401).json({ error: 'Unauthorized' });
   }
   
@@ -76,6 +77,10 @@ app.get('/api/user/stats', checkAuth, getDashboardStats);
 // Analysis Routes
 app.post('/api/analyze', checkAuth, heavyTaskLimiter, startAnalysis);
 app.get('/api/analyze/:id', checkAuth, getAnalysisResult);
+
+// Simulation Routes
+app.post('/api/simulate', checkAuth, startSimulation);
+app.get('/api/simulate/:id', checkAuth, getSimulationResult);
 
 // Global Error Handler (must be last)
 app.use(errorHandler);

@@ -10,6 +10,7 @@ import {
 } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
 import jsPDF from "jspdf"
+import { useAuth } from "@/contexts/AuthContext"
 
 // --- Brand SVG Icons --------------------------------------------------------
 const OpenAIIcon = ({ className = "w-4 h-4" }) => (
@@ -201,6 +202,7 @@ export default function AISimulation() {
     const [isSimulating, setIsSimulating] = useState(false)
     const [results, setResults] = useState(null)
     const [isExporting, setIsExporting] = useState(false)
+    const { getToken } = useAuth()
 
     const toggleModel = (modelId) => {
         setSelectedModels((prev) =>
@@ -210,22 +212,66 @@ export default function AISimulation() {
         )
     }
 
-    const handleSimulate = () => {
+    const handleSimulate = async () => {
         const hasInput = inputMode === "url" ? url : content
         if (!hasInput || selectedModels.length === 0) return
         setIsSimulating(true)
         setResults(null)
 
-        setTimeout(() => {
-            const res = {}
-            selectedModels.forEach((id) => {
-                if (SIMULATED_RESULTS[id]) {
-                    res[id] = SIMULATED_RESULTS[id]
-                }
+        try {
+            const token = await getToken()
+            const payload = {
+                selectedModels,
+                ...(inputMode === "url" ? { url } : { content })
+            }
+
+            const res = await fetch("http://localhost:5000/api/simulate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
             })
-            setResults(res)
+
+            if (!res.ok) {
+                console.error("Failed to enqueue simulation job")
+                setIsSimulating(false)
+                return
+            }
+
+            const resData = await res.json()
+            const jobId = resData.simulation._id
+
+            const pollInterval = setInterval(async () => {
+                try {
+                    const pollRes = await fetch(`http://localhost:5000/api/simulate/${jobId}`, {
+                        headers: { "Authorization": `Bearer ${token}` }
+                    })
+                    
+                    if (pollRes.ok) {
+                        const pollData = await pollRes.json()
+                        if (pollData.status === 'Completed') {
+                            clearInterval(pollInterval)
+                            setResults(pollData.results)
+                            setIsSimulating(false)
+                        } else if (pollData.status === 'Failed') {
+                            clearInterval(pollInterval)
+                            console.error("Simulation failed:", pollData.error)
+                            setIsSimulating(false)
+                        }
+                    }
+                } catch (err) {
+                    console.error("Polling error", err)
+                    clearInterval(pollInterval)
+                    setIsSimulating(false)
+                }
+            }, 3000)
+
+        } catch (err) {
+            console.error("Simulation API error", err)
             setIsSimulating(false)
-        }, 2800)
+        }
     }
 
     const handleExport = () => {
