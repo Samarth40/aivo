@@ -32,7 +32,7 @@ redisClient.on('error', (err) => console.error('❌ Redis error:', err.message))
 // Standard API Rate Limiter
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: 1000,
   standardHeaders: true,
   legacyHeaders: false,
   store: new RedisStore({
@@ -44,7 +44,7 @@ export const apiLimiter = rateLimit({
 // Stricter Rate Limiter for heavy endpoints (like starting an Analysis)
 export const heavyTaskLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10,
+  max: 1000,
   standardHeaders: true,
   legacyHeaders: false,
   store: new RedisStore({
