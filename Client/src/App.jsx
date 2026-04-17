@@ -17,6 +17,7 @@ import GuestRoute from '@/components/auth/GuestRoute'
 import LoginForm from '@/components/auth/LoginForm'
 import SignUpForm from '@/components/auth/SignUpForm'
 import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm'
+import SSOCallback from '@/components/auth/SSOCallback'
 
 // Pages
 import LandingPage from '@/pages/LandingPage'
@@ -79,6 +80,9 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPasswordForm />} />
             <Route path="/auth" element={<Navigate to="/login" replace />} />
           </Route>
+
+          {/* SSO Callback — handles OAuth redirect from Google/GitHub */}
+          <Route path="/sso-callback" element={<SSOCallback />} />
 
           {/* Onboarding — requires auth but NOT onboarding check */}
           <Route path="/onboarding" element={<OnboardingPage />} />

@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
 import jsPDF from "jspdf"
+import { useAuth } from "@/contexts/AuthContext"
 
 // ─── Pipeline Phase Constants ───────────────────────────────────────────
 const PHASE_IDLE = "idle"
@@ -78,9 +79,10 @@ export default function AnalysisPipeline() {
     const [entityResult, setEntityResult] = useState(null)
     const [activeTab, setActiveTab] = useState("extraction")
     const [isExporting, setIsExporting] = useState(false)
+    const { getToken } = useAuth()
 
     // ─── Run the pipeline ────────────────────────────────────────────
-    const handleRunPipeline = useCallback(() => {
+    const handleRunPipeline = useCallback(async () => {
         if (!url) return
 
         // Reset
@@ -98,6 +100,26 @@ export default function AnalysisPipeline() {
             noiseRemoved: "34%",
             cleanText: "Answer Engine Optimization (AEO) is the ongoing process of structuring and writing content specifically so that Generative AI models (like ChatGPT, Gemini, and Perplexity) will cite and paraphrase it directly in their answers.\n\nUnlike traditional SEO which focuses on ten blue links, AEO focuses entirely on the synthesis of factual entities. To succeed, content must be dense in facts, devoid of promotional marketing fluff, and structured logically using clear H2s and bulleted lists.\n\nThe core of AEO relies on ensuring your Knowledge Graph is populated with your brand's specific terminology and entities. By treating your website as a raw data API designed for LLMs, you vastly increase the likelihood of inclusion in AI Overviews.",
             elementsStripped: ["Global Navbar", "Cookie Consent Banner", "Sidebar Advertisements (3)", "Footer Links"],
+        }
+        
+        try {
+            const token = await getToken()
+            const res = await fetch("http://localhost:5000/api/analyze", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ url })
+            })
+            if (res.ok) {
+                const data = await res.json()
+                console.log("Analysis job successfully enqueued:", data)
+            } else {
+                console.error("Failed to enqueue analysis job:", res.status, res.statusText)
+            }
+        } catch (err) {
+            console.error("Error communicating with API Gateway:", err)
         }
 
         setTimeout(() => {
@@ -148,7 +170,7 @@ export default function AnalysisPipeline() {
             }, 1800)
 
         }, 1500)
-    }, [url])
+    }, [url, getToken])
 
     // ─── Export all results as PDF ──────────────────────────────────
     const handleExport = useCallback(() => {
