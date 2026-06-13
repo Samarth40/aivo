@@ -5,53 +5,85 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
-// ─── Resolve absolute path to Server/.env ────────────────────────────────────
-// rateLimiter.js: Server/gateway/src/middleware/rateLimiter.js
-// Server/.env is 3 levels up: middleware/ -> src/ -> gateway/ -> Server/
+// ─── Resolve absolute path to Server/.env ─────────────────────────────────────
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const envPath = path.resolve(__dirname, '../../../.env');
 dotenv.config({ path: envPath });
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+const REDIS_URL = process.env.REDIS_URL || null;
 
-if (!process.env.REDIS_URL) {
-  console.warn('⚠️  REDIS_URL is not set. Falling back to localhost:6379');
+// ─── Redis Client (optional) ───────────────────────────────────────────────────
+let redisClient = null;
+let redisReady = false;
+
+if (REDIS_URL) {
+  try {
+    redisClient = new Redis(REDIS_URL, {
+      maxRetriesPerRequest: null,
+      enableReadyCheck: false,
+      lazyConnect: true,
+      connectTimeout: 5000,
+      retryStrategy: (times) => {
+        if (times > 2) return null; // give up after 2 retries
+        return Math.min(times * 500, 2000);
+      },
+    });
+
+    redisClient.on('ready', () => {
+      redisReady = true;
+      console.log('✅ Redis connected and ready');
+    });
+
+    redisClient.on('error', (err) => {
+      redisReady = false;
+      // suppress repeated error noise — just warn once
+      if (!redisClient._warnedOnce) {
+        redisClient._warnedOnce = true;
+        console.warn('⚠️  Redis unavailable (non-fatal), using in-memory rate limiting:', err.message);
+      }
+    });
+
+    redisClient.on('close', () => { redisReady = false; });
+
+    // Connect async — don't block server startup
+    redisClient.connect().catch(() => {});
+  } catch (e) {
+    console.warn('⚠️  Failed to initialise Redis client:', e.message);
+    redisClient = null;
+  }
+} else {
+  console.warn('⚠️  REDIS_URL not set — using in-memory rate limiting.');
 }
 
-// ioredis client — no lazyConnect so it connects immediately on startup
-const redisClient = new Redis(REDIS_URL, {
-  maxRetriesPerRequest: 3,
-  enableReadyCheck: false,
-});
+// ─── Store Factory ─────────────────────────────────────────────────────────────
+// Returns a RedisStore if Redis is ready, otherwise falls back to default (memory)
+const makeStore = () => {
+  if (redisClient && redisReady) {
+    return new RedisStore({
+      sendCommand: (...args) => redisClient.call(...args),
+    });
+  }
+  return undefined; // express-rate-limit defaults to memory store
+};
 
-redisClient.on('connect', () => console.log('✅ Redis connected'));
-redisClient.on('ready', () => console.log('✅ Redis ready'));
-redisClient.on('error', (err) => console.error('❌ Redis error:', err.message));
-
-// Standard API Rate Limiter
+// ─── Standard API Rate Limiter ─────────────────────────────────────────────────
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 1000,
   standardHeaders: true,
   legacyHeaders: false,
-  store: new RedisStore({
-    sendCommand: (...args) => redisClient.call(...args),
-  }),
-  message: { error: 'Too many requests from this IP, please try again after 15 minutes' }
+  message: { error: 'Too many requests from this IP, please try again after 15 minutes' },
 });
 
-// Stricter Rate Limiter for heavy endpoints (like starting an Analysis)
+// ─── Heavy Task Rate Limiter ───────────────────────────────────────────────────
 export const heavyTaskLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 1000,
   standardHeaders: true,
   legacyHeaders: false,
-  store: new RedisStore({
-    sendCommand: (...args) => redisClient.call(...args),
-  }),
-  message: { error: 'Analysis quota exceeded. Please try again in an hour.' }
+  message: { error: 'Analysis quota exceeded. Please try again in an hour.' },
 });
 
-// Export client so controllers can use the same connection to push jobs
+// Export client so controllers can push jobs to the Redis queue
 export { redisClient };

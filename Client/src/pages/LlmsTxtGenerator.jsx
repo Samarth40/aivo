@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
 import { useAuth } from "@/contexts/AuthContext"
+import { llmsApi, pollJob } from "@/services/api"
 // ─── Helpers ─────────────────────────────────────────────────────────
 const createSection = (title = "", links = [{ label: "", url: "" }]) => ({
     id: crypto.randomUUID(),
@@ -136,64 +137,39 @@ export default function LlmsTxtGenerator() {
 
         try {
             const token = await getToken()
-            const res = await fetch("http://localhost:5000/api/llmstxt", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({ url })
-            })
+            const { job } = await llmsApi.start(token, url)
+            const jobId = job._id
 
-            if (!res.ok) {
-                const errData = await res.json()
-                setErrorMsg(errData.error || "Failed to enqueue llms.txt generation request")
-                setPhase("error")
-                return
-            }
-
-            const data = await res.json()
-            const jobId = data.job._id
-
-            // Poll the backend
-            const pollInterval = setInterval(async () => {
-                try {
+            const cancel = pollJob(
+                async () => {
                     const freshToken = await getToken()
-                    const pollRes = await fetch(`http://localhost:5000/api/llmstxt/${jobId}`, {
-                        headers: { "Authorization": `Bearer ${freshToken}` }
-                    })
-                    
-                    if (pollRes.ok) {
-                        const pollData = await pollRes.json()
-                        const status = pollData.status
+                    return llmsApi.getById(freshToken, jobId)
+                },
+                (pollData) => {
+                    const status = pollData.status
 
-                        if (status === 'Crawling') setCrawlStep(1)
-                        if (status === 'Generating') setCrawlStep(3)
+                    if (status === 'Crawling') setCrawlStep(1)
+                    if (status === 'Generating') setCrawlStep(3)
 
-                        if (status === 'Completed') {
-                            clearInterval(pollInterval)
-                            const results = pollData.results
-                            if (results) {
-                                setBrandName(results.brandName || "")
-                                setDomain(results.domain || url)
-                                setTagline(results.tagline || "")
-                                setDescription(results.description || "")
-                                setSections(results.sections || [])
-                            }
-                            setPhase("editing")
-                        } else if (status === 'Failed') {
-                            clearInterval(pollInterval)
-                            setErrorMsg(pollData.error || "Worker failed to generate llms.txt")
-                            setPhase("error")
+                    if (status === 'Completed') {
+                        cancel()
+                        const results = pollData.results
+                        if (results) {
+                            setBrandName(results.brandName || "")
+                            setDomain(results.domain || url)
+                            setTagline(results.tagline || "")
+                            setDescription(results.description || "")
+                            setSections(results.sections || [])
                         }
+                        setPhase("editing")
+                    } else if (status === 'Failed') {
+                        cancel()
+                        setErrorMsg(pollData.error || "Worker failed to generate llms.txt")
+                        setPhase("error")
                     }
-                } catch (pollErr) {
-                    clearInterval(pollInterval)
-                    setErrorMsg("Lost connection while polling for results.")
-                    setPhase("error")
-                }
-            }, 3000)
-
+                },
+                3000
+            )
         } catch (e) {
             setErrorMsg(e.message)
             setPhase("error")

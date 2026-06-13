@@ -11,6 +11,7 @@ import {
 import { motion, AnimatePresence } from "motion/react"
 import jsPDF from "jspdf"
 import { useAuth } from "@/contexts/AuthContext"
+import { simulationApi, pollJob } from "@/services/api"
 
 // --- Brand SVG Icons --------------------------------------------------------
 const OpenAIIcon = ({ className = "w-4 h-4" }) => (
@@ -225,50 +226,27 @@ export default function AISimulation() {
                 ...(inputMode === "url" ? { url } : { content })
             }
 
-            const res = await fetch("http://localhost:5000/api/simulate", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+            const { simulation } = await simulationApi.start(token, payload)
+            const jobId = simulation._id
+
+            const cancel = pollJob(
+                async () => {
+                    const freshToken = await getToken()
+                    return simulationApi.getById(freshToken, jobId)
                 },
-                body: JSON.stringify(payload)
-            })
-
-            if (!res.ok) {
-                console.error("Failed to enqueue simulation job")
-                setIsSimulating(false)
-                return
-            }
-
-            const resData = await res.json()
-            const jobId = resData.simulation._id
-
-            const pollInterval = setInterval(async () => {
-                try {
-                    const freshToken = await getToken()  // fresh token every poll
-                    const pollRes = await fetch(`http://localhost:5000/api/simulate/${jobId}`, {
-                        headers: { "Authorization": `Bearer ${freshToken}` }
-                    })
-                    
-                    if (pollRes.ok) {
-                        const pollData = await pollRes.json()
-                        if (pollData.status === 'Completed') {
-                            clearInterval(pollInterval)
-                            setResults(pollData.results)
-                            setIsSimulating(false)
-                        } else if (pollData.status === 'Failed') {
-                            clearInterval(pollInterval)
-                            console.error("Simulation failed:", pollData.error)
-                            setIsSimulating(false)
-                        }
+                (pollData) => {
+                    if (pollData.status === 'Completed') {
+                        cancel()
+                        setResults(pollData.results)
+                        setIsSimulating(false)
+                    } else if (pollData.status === 'Failed') {
+                        cancel()
+                        console.error("Simulation failed:", pollData.error)
+                        setIsSimulating(false)
                     }
-                } catch (err) {
-                    console.error("Polling error", err)
-                    clearInterval(pollInterval)
-                    setIsSimulating(false)
-                }
-            }, 3000)
-
+                },
+                3000
+            )
         } catch (err) {
             console.error("Simulation API error", err)
             setIsSimulating(false)

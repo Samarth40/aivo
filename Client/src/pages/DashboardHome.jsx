@@ -18,6 +18,7 @@ import {
     Quote,
 } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
+import { userApi, analysisApi } from "@/services/api"
 
 const RANGES = [
     { key: "3m", label: "3 Months" },
@@ -33,23 +34,20 @@ export default function DashboardHome() {
         avgScore: 0,
         domainsTracked: 0
     })
+    const [recentAnalyses, setRecentAnalyses] = useState([])
 
     useEffect(() => {
-        const fetchStats = async () => {
+        const fetchDashboard = async () => {
             try {
                 const token = await getToken()
-                const res = await fetch("http://localhost:5000/api/user/stats", {
-                    headers: { Authorization: `Bearer ${token}` }
-                })
-                if (res.ok) {
-                    const data = await res.json()
-                    setStats(data.stats)
-                }
+                // Fetch stats
+                const statsRes = await userApi.getStats(token)
+                if (statsRes?.stats) setStats(statsRes.stats)
             } catch (err) {
                 console.error("Failed to fetch dashboard stats", err)
             }
         }
-        fetchStats()
+        fetchDashboard()
     }, [getToken])
 
     return (
@@ -177,7 +175,7 @@ export default function DashboardHome() {
                         View All
                     </Button>
                 </div>
-                <DataTable />
+                <DataTable analyses={recentAnalyses} />
             </div>
         </div>
     )
