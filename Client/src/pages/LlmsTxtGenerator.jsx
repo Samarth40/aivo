@@ -13,6 +13,7 @@ import {
 import { motion, AnimatePresence } from "motion/react"
 import { useAuth } from "@/contexts/AuthContext"
 import { llmsApi, pollJob } from "@/services/api"
+import { toast } from "sonner"
 // ─── Helpers ─────────────────────────────────────────────────────────
 const createSection = (title = "", links = [{ label: "", url: "" }]) => ({
     id: crypto.randomUUID(),
@@ -98,6 +99,38 @@ export default function LlmsTxtGenerator() {
     // ─── UI State ────────────────────────────────────────────────────
     const [copied, setCopied] = useState(false)
 
+    const hydrateResult = useCallback((results, originalUrl) => {
+        if (results) {
+            setBrandName(results.brandName || "")
+            setDomain(results.domain || originalUrl)
+            setTagline(results.tagline || "")
+            setDescription(results.description || "")
+            setSections(results.sections || [])
+            setPhase("editing")
+        }
+    }, [])
+
+    React.useEffect(() => {
+        const lastJobId = sessionStorage.getItem("lastLlmsJobId")
+        if (!lastJobId) return
+
+        let isMounted = true
+        const restoreJob = async () => {
+            try {
+                const token = await getToken()
+                const data = await llmsApi.getById(token, lastJobId)
+                if (isMounted && data && data.status === "Completed" && data.results) {
+                    setUrl(data.url || "")
+                    hydrateResult(data.results, data.url)
+                }
+            } catch (err) {
+                console.error("Failed to restore llms job:", err)
+            }
+        }
+        restoreJob()
+        return () => { isMounted = false }
+    }, [getToken, hydrateResult])
+
     // ─── Computed llms.txt output ────────────────────────────────────
     const llmsTxt = useMemo(() => {
         let output = ""
@@ -139,6 +172,7 @@ export default function LlmsTxtGenerator() {
             const token = await getToken()
             const { job } = await llmsApi.start(token, url)
             const jobId = job._id
+            sessionStorage.setItem("lastLlmsJobId", jobId)
 
             const cancel = pollJob(
                 async () => {
@@ -153,17 +187,11 @@ export default function LlmsTxtGenerator() {
 
                     if (status === 'Completed') {
                         cancel()
-                        const results = pollData.results
-                        if (results) {
-                            setBrandName(results.brandName || "")
-                            setDomain(results.domain || url)
-                            setTagline(results.tagline || "")
-                            setDescription(results.description || "")
-                            setSections(results.sections || [])
-                        }
-                        setPhase("editing")
+                        toast.success("Generation Complete!")
+                        hydrateResult(pollData.results, url)
                     } else if (status === 'Failed') {
                         cancel()
+                        toast.error("Generation Failed: " + pollData.error)
                         setErrorMsg(pollData.error || "Worker failed to generate llms.txt")
                         setPhase("error")
                     }

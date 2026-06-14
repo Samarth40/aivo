@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -15,6 +15,8 @@ import {
 import { motion } from "motion/react"
 import { useAuth } from "@/contexts/AuthContext"
 import { competitorApi, pollJob } from "@/services/api"
+import { toast } from "sonner"
+import { downloadCSV } from "@/lib/exportUtils"
 
 // --- Simulated data ---
 const generateComparison = (targetUrl, competitorUrl) => {
@@ -127,6 +129,37 @@ export default function CompetitorIntelligence() {
         try { return new URL(u.startsWith("http") ? u : `https://${u}`).hostname } catch { return u }
     }
 
+    const hydrateResult = useCallback((pollData) => {
+        const results = pollData.results
+        if (results) {
+            results.target.domain = getDomain(results.target.url || "")
+            results.competitor.domain = getDomain(results.competitor.url || "")
+            setComparison(results)
+        }
+    }, [])
+
+    React.useEffect(() => {
+        const lastJobId = sessionStorage.getItem("lastCompetitorJobId")
+        if (!lastJobId) return
+
+        let isMounted = true
+        const restoreJob = async () => {
+            try {
+                const token = await getToken()
+                const data = await competitorApi.getById(token, lastJobId)
+                if (isMounted && data && data.status === "Completed") {
+                    setTargetUrl(data.targetUrl || "")
+                    setCompetitorUrl(data.competitorUrl || "")
+                    hydrateResult(data)
+                }
+            } catch (err) {
+                console.error("Failed to restore competitor job:", err)
+            }
+        }
+        restoreJob()
+        return () => { isMounted = false }
+    }, [getToken, hydrateResult])
+
     const handleAnalyze = async () => {
         if (!targetUrl.trim() || !competitorUrl.trim()) return
         setIsAnalyzing(true)
@@ -137,6 +170,7 @@ export default function CompetitorIntelligence() {
             const token = await getToken()
             const { competitor } = await competitorApi.start(token, targetUrl, competitorUrl)
             const jobId = competitor._id
+            sessionStorage.setItem("lastCompetitorJobId", jobId)
 
             const cancel = pollJob(
                 async () => {
@@ -146,16 +180,13 @@ export default function CompetitorIntelligence() {
                 (pollData) => {
                     if (pollData.status === 'Completed') {
                         cancel()
-                        const results = pollData.results
-                        if (results) {
-                            if (results.target) results.target.domain = getDomain(results.target.url || targetUrl)
-                            if (results.competitor) results.competitor.domain = getDomain(results.competitor.url || competitorUrl)
-                            setComparison(results)
-                        }
+                        toast.success("Competitor Analysis Complete!")
+                        hydrateResult(pollData)
                         setIsAnalyzing(false)
                     } else if (pollData.status === 'Failed') {
                         cancel()
-                        setErrorMsg(pollData.error || "Python worker failed to analyze competitors.")
+                        toast.error("Analysis Failed: " + pollData.error)
+                        setErrorMsg(pollData.error || "Failed to complete analysis.")
                         setIsAnalyzing(false)
                     }
                 },
@@ -278,9 +309,22 @@ export default function CompetitorIntelligence() {
                                 <TabsTrigger value="insights">Insights</TabsTrigger>
                                 <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
                             </TabsList>
-                            <Button variant="outline" size="sm" onClick={() => downloadReport(comparison)}>
-                                <Download className="w-3.5 h-3.5 mr-1.5" /> Download Report
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button variant="outline" size="sm" onClick={() => {
+                                    const csvData = SCORE_ROWS.map(({ key, label }) => ({
+                                        metric: label,
+                                        yourScore: comparison.target.scores[key],
+                                        competitorScore: comparison.competitor.scores[key],
+                                        gap: comparison.target.scores[key] - comparison.competitor.scores[key]
+                                    }))
+                                    downloadCSV("aivo_competitor_comparison.csv", csvData)
+                                }}>
+                                    Export CSV
+                                </Button>
+                                <Button variant="outline" size="sm" onClick={() => downloadReport(comparison)}>
+                                    <Download className="w-3.5 h-3.5 mr-1.5" /> Download Report
+                                </Button>
+                            </div>
                         </div>
 
                         {/* Scores Tab */}
