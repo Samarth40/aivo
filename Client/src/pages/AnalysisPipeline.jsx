@@ -14,6 +14,7 @@ import {
 import { motion, AnimatePresence } from "motion/react"
 import jsPDF from "jspdf"
 import { useAuth } from "@/contexts/AuthContext"
+import { analysisApi, pollJob } from "@/services/api"
 
 // ─── Pipeline Phase Constants ───────────────────────────────────────────
 const PHASE_IDLE = "idle"
@@ -89,107 +90,74 @@ export default function AnalysisPipeline() {
         setScoringResult(null)
         setEntityResult(null)
         setActiveTab("extraction")
-
-        // Initial phase
         setPhase(PHASE_EXTRACTING)
-        
+
         try {
             const token = await getToken()
-            // 1. Kick off analysis
-            const res = await fetch("http://localhost:5000/api/analyze", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({ url })
-            })
-            
-            if (!res.ok) {
-                console.error("Failed to enqueue analysis job")
-                setPhase(PHASE_IDLE)
-                return
-            }
-            
-            const resData = await res.json()
-            const jobId = resData.analysis._id
-            
-            // 2. Poll for results
-            const pollInterval = setInterval(async () => {
-                try {
-                    const freshToken = await getToken()  // fresh token every poll
-                    const pollRes = await fetch(`http://localhost:5000/api/analyze/${jobId}`, {
-                        headers: { "Authorization": `Bearer ${freshToken}` }
-                    })
-                    
-                    if (pollRes.ok) {
-                        const pollData = await pollRes.json()
-                        const status = pollData.status
-                        
-                        // Map backend status to frontend phases
-                        if (status === 'Extracting') {
-                            setPhase(PHASE_EXTRACTING)
-                        } else if (status === 'Analyzing') {
-                            setPhase(PHASE_SCORING)
-                            
-                            // Provide placeholder while analyzing
-                            if (!extractionResult) {
-                                setExtractionResult({
-                                    title: "Raw Extraction Complete",
-                                    wordCount: "N/A",
-                                    noiseRemoved: "Cleaned",
-                                    cleanText: "HTML text extracted. Generating AIVO semantic metrics... Please wait.",
-                                    elementsStripped: ["Noise", "Scripts", "Nav"]
-                                })
-                            }
-                        } else if (status === 'Completed') {
-                            clearInterval(pollInterval)
-                            setPhase(PHASE_COMPLETE)
-                            
-                            // Map actual backend results to the UI
-                            const result = pollData
-                            
-                            // Fake extraction summary since we didn't save raw text to mongo
-                            setExtractionResult({
-                                title: url,
-                                wordCount: "Analyzed",
-                                noiseRemoved: "HTML Cleaned",
-                                cleanText: "Semantic Analysis Complete. SEO metrics have been fully retrieved from the AIVO backend Engine.",
-                                elementsStripped: []
-                            })
-                            
-                            setScoringResult({
-                                overallScore: result.scoreInfo?.aiVisibilityScore || 0,
-                                topicMatch: (result.scoreInfo?.expectedCitations || 0) * 10,
-                                comprehensiveness: (result.semanticDensity || 0) * 10,
-                                missingSubtopics: [],
-                                strongSubtopics: []
-                            })
-                            
-                            const entities = result.entitiesFound || []
-                            setEntityResult({
-                                entitiesFound: entities.length,
-                                relationships: entities.length * 2,
-                                topEntities: entities.map(ent => ({ name: ent, type: "Entity", confidence: "High" })),
-                                graphNodes: entities.map((ent, i) => ({ id: i, label: ent, x: 50 + (i*10), y: 50 + (i*5) }))
-                            })
-                        } else if (status === 'Failed') {
-                            clearInterval(pollInterval)
-                            setPhase(PHASE_IDLE)
-                            console.error("Analysis failed:", pollData.errorMessage)
-                            alert("Analysis Failed: " + pollData.errorMessage)
-                        }
-                    }
-                } catch (e) {
-                    console.error("Polling error", e)
-                }
-            }, 2000)
+            const { analysis } = await analysisApi.start(token, url)
+            const jobId = analysis._id
 
+            const cancel = pollJob(
+                async () => {
+                    const freshToken = await getToken()
+                    return analysisApi.getById(freshToken, jobId)
+                },
+                (pollData) => {
+                    const status = pollData.status
+
+                    if (status === 'Extracting') {
+                        setPhase(PHASE_EXTRACTING)
+                    } else if (status === 'Analyzing') {
+                        setPhase(PHASE_SCORING)
+                        if (!extractionResult) {
+                            setExtractionResult({
+                                title: "Raw Extraction Complete",
+                                wordCount: "N/A",
+                                noiseRemoved: "Cleaned",
+                                cleanText: "HTML text extracted. Generating AIVO semantic metrics... Please wait.",
+                                elementsStripped: ["Noise", "Scripts", "Nav"]
+                            })
+                        }
+                    } else if (status === 'Completed') {
+                        cancel()
+                        setPhase(PHASE_COMPLETE)
+
+                        setExtractionResult({
+                            title: url,
+                            wordCount: "Analyzed",
+                            noiseRemoved: "HTML Cleaned",
+                            cleanText: "Semantic Analysis Complete. SEO metrics have been fully retrieved from the AIVO backend Engine.",
+                            elementsStripped: []
+                        })
+
+                        setScoringResult({
+                            overallScore: pollData.scoreInfo?.aiVisibilityScore || 0,
+                            topicMatch: (pollData.scoreInfo?.expectedCitations || 0) * 10,
+                            comprehensiveness: (pollData.semanticDensity || 0) * 10,
+                            missingSubtopics: [],
+                            strongSubtopics: []
+                        })
+
+                        const entities = pollData.entitiesFound || []
+                        setEntityResult({
+                            entitiesFound: entities.length,
+                            relationships: entities.length * 2,
+                            topEntities: entities.map(ent => ({ name: ent, type: "Entity", confidence: "High" })),
+                            graphNodes: entities.map((ent, i) => ({ id: i, label: ent, x: 50 + (i * 10), y: 50 + (i * 5) }))
+                        })
+                    } else if (status === 'Failed') {
+                        cancel()
+                        setPhase(PHASE_IDLE)
+                        alert("Analysis Failed: " + pollData.errorMessage)
+                    }
+                },
+                2000
+            )
         } catch (err) {
             console.error("Error communicating with API Gateway:", err)
             setPhase(PHASE_IDLE)
         }
-    }, [url, getToken])
+    }, [url, getToken, extractionResult])
 
     // ─── Export all results as PDF ──────────────────────────────────
     const handleExport = useCallback(() => {

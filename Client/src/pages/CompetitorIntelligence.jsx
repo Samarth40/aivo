@@ -13,8 +13,8 @@ import {
     ArrowUpRight, ArrowDownRight, Minus, Lightbulb, Info
 } from "lucide-react"
 import { motion } from "motion/react"
-
 import { useAuth } from "@/contexts/AuthContext"
+import { competitorApi, pollJob } from "@/services/api"
 
 // --- Simulated data ---
 const generateComparison = (targetUrl, competitorUrl) => {
@@ -132,61 +132,35 @@ export default function CompetitorIntelligence() {
         setIsAnalyzing(true)
         setComparison(null)
         setErrorMsg(null)
-        
+
         try {
             const token = await getToken()
-            const res = await fetch("http://localhost:5000/api/competitor", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({ targetUrl, competitorUrl })
-            })
+            const { competitor } = await competitorApi.start(token, targetUrl, competitorUrl)
+            const jobId = competitor._id
 
-            if (!res.ok) {
-                const err = await res.json()
-                setErrorMsg(err.error || "Failed to start analysis")
-                setIsAnalyzing(false)
-                return
-            }
-
-            const data = await res.json()
-            const jobId = data.competitor._id
-
-            const pollInterval = setInterval(async () => {
-                try {
+            const cancel = pollJob(
+                async () => {
                     const freshToken = await getToken()
-                    const pollRes = await fetch(`http://localhost:5000/api/competitor/${jobId}`, {
-                        headers: { "Authorization": `Bearer ${freshToken}` }
-                    })
-                    
-                    if (pollRes.ok) {
-                        const pollData = await pollRes.json()
-                        
-                        if (pollData.status === 'Completed') {
-                            clearInterval(pollInterval)
-                            const results = pollData.results
-                            // Ensure domains are attached for the UI
-                            if (results) {
-                                if (results.target) results.target.domain = getDomain(results.target.url || targetUrl)
-                                if (results.competitor) results.competitor.domain = getDomain(results.competitor.url || competitorUrl)
-                                setComparison(results)
-                            }
-                            setIsAnalyzing(false)
-                        } else if (pollData.status === 'Failed') {
-                            clearInterval(pollInterval)
-                            setErrorMsg(pollData.error || "Python worker failed to analyze competitors.")
-                            setIsAnalyzing(false)
+                    return competitorApi.getById(freshToken, jobId)
+                },
+                (pollData) => {
+                    if (pollData.status === 'Completed') {
+                        cancel()
+                        const results = pollData.results
+                        if (results) {
+                            if (results.target) results.target.domain = getDomain(results.target.url || targetUrl)
+                            if (results.competitor) results.competitor.domain = getDomain(results.competitor.url || competitorUrl)
+                            setComparison(results)
                         }
+                        setIsAnalyzing(false)
+                    } else if (pollData.status === 'Failed') {
+                        cancel()
+                        setErrorMsg(pollData.error || "Python worker failed to analyze competitors.")
+                        setIsAnalyzing(false)
                     }
-                } catch (pollErr) {
-                    clearInterval(pollInterval)
-                    setErrorMsg("Lost connection while polling for results.")
-                    setIsAnalyzing(false)
-                }
-            }, 3000)
-
+                },
+                3000
+            )
         } catch (e) {
             setErrorMsg(e.message)
             setIsAnalyzing(false)
