@@ -19,6 +19,7 @@ import {
 } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 import { userApi, analysisApi } from "@/services/api"
+import { downloadCSV } from "@/lib/exportUtils"
 
 const RANGES = [
     { key: "3m", label: "3 Months" },
@@ -43,6 +44,7 @@ export default function DashboardHome() {
                 // Fetch stats
                 const statsRes = await userApi.getStats(token)
                 if (statsRes?.stats) setStats(statsRes.stats)
+                if (statsRes?.recentAnalyses) setRecentAnalyses(statsRes.recentAnalyses)
             } catch (err) {
                 console.error("Failed to fetch dashboard stats", err)
             }
@@ -171,9 +173,14 @@ export default function DashboardHome() {
                         <h3 className="text-sm font-semibold">Recent Analyses</h3>
                         <p className="text-xs text-muted-foreground">Latest engine runs across your content</p>
                     </div>
-                    <Button variant="outline" size="sm" className="h-7 text-xs">
-                        View All
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => downloadCSV("aivo_dashboard_data.csv", recentAnalyses)}>
+                            Export CSV
+                        </Button>
+                        <Button variant="outline" size="sm" className="h-7 text-xs">
+                            View All
+                        </Button>
+                    </div>
                 </div>
                 <DataTable analyses={recentAnalyses} />
             </div>

@@ -3,6 +3,7 @@ import './App.css'
 
 // Context
 import { AuthProvider } from '@/contexts/AuthContext'
+import { Toaster } from 'sonner'
 
 // Layouts
 import AppLayout from '@/components/layout/AppLayout'
@@ -53,6 +54,7 @@ import SitePreferences from '@/pages/Legal/SitePreferences'
 function App() {
   return (
     <AuthProvider>
+      <Toaster position="top-right" richColors />
       <BrowserRouter>
         <Routes>
           {/* Public Routes */}

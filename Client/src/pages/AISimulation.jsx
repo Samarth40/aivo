@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from "motion/react"
 import jsPDF from "jspdf"
 import { useAuth } from "@/contexts/AuthContext"
 import { simulationApi, pollJob } from "@/services/api"
+import { toast } from "sonner"
 
 // --- Brand SVG Icons --------------------------------------------------------
 const OpenAIIcon = ({ className = "w-4 h-4" }) => (
@@ -205,6 +206,34 @@ export default function AISimulation() {
     const [isExporting, setIsExporting] = useState(false)
     const { getToken } = useAuth()
 
+    React.useEffect(() => {
+        const lastJobId = sessionStorage.getItem("lastSimulationJobId")
+        if (!lastJobId) return
+
+        let isMounted = true
+        const restoreJob = async () => {
+            try {
+                const token = await getToken()
+                const data = await simulationApi.getById(token, lastJobId)
+                if (isMounted && data && data.status === "Completed") {
+                    if (data.url) {
+                        setInputMode("url")
+                        setUrl(data.url)
+                    } else if (data.content) {
+                        setInputMode("content")
+                        setContent(data.content)
+                    }
+                    if (data.selectedModels) setSelectedModels(data.selectedModels)
+                    setResults(data.results)
+                }
+            } catch (err) {
+                console.error("Failed to restore simulation job:", err)
+            }
+        }
+        restoreJob()
+        return () => { isMounted = false }
+    }, [getToken])
+
     const toggleModel = (modelId) => {
         setSelectedModels((prev) =>
             prev.includes(modelId)
@@ -228,6 +257,7 @@ export default function AISimulation() {
 
             const { simulation } = await simulationApi.start(token, payload)
             const jobId = simulation._id
+            sessionStorage.setItem("lastSimulationJobId", jobId)
 
             const cancel = pollJob(
                 async () => {
@@ -237,10 +267,12 @@ export default function AISimulation() {
                 (pollData) => {
                     if (pollData.status === 'Completed') {
                         cancel()
+                        toast.success("Simulation Complete!")
                         setResults(pollData.results)
                         setIsSimulating(false)
                     } else if (pollData.status === 'Failed') {
                         cancel()
+                        toast.error("Simulation Failed: " + pollData.error)
                         console.error("Simulation failed:", pollData.error)
                         setIsSimulating(false)
                     }

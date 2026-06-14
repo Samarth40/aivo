@@ -15,6 +15,8 @@ import { motion, AnimatePresence } from "motion/react"
 import jsPDF from "jspdf"
 import { useAuth } from "@/contexts/AuthContext"
 import { analysisApi, pollJob } from "@/services/api"
+import { toast } from "sonner"
+import { downloadCSV } from "@/lib/exportUtils"
 
 // ─── Pipeline Phase Constants ───────────────────────────────────────────
 const PHASE_IDLE = "idle"
@@ -82,6 +84,55 @@ export default function AnalysisPipeline() {
     const [isExporting, setIsExporting] = useState(false)
     const { getToken } = useAuth()
 
+    const hydrateResult = useCallback((pollData, urlValue) => {
+        setPhase(PHASE_COMPLETE)
+        setExtractionResult({
+            title: urlValue || pollData.url || "Analyzed URL",
+            wordCount: "Analyzed",
+            noiseRemoved: "HTML Cleaned",
+            cleanText: "Semantic Analysis Complete. SEO metrics have been fully retrieved from the AIVO backend Engine.",
+            elementsStripped: []
+        })
+
+        setScoringResult({
+            overallScore: pollData.scoreInfo?.aiVisibilityScore || 0,
+            topicMatch: (pollData.scoreInfo?.expectedCitations || 0) * 10,
+            comprehensiveness: (pollData.semanticDensity || 0) * 10,
+            missingSubtopics: [],
+            strongSubtopics: []
+        })
+
+        const entities = pollData.entitiesFound || []
+        setEntityResult({
+            entitiesFound: entities.length,
+            relationships: entities.length * 2,
+            topEntities: entities.map(ent => ({ name: ent, type: "Entity", confidence: "High" })),
+            graphNodes: entities.map((ent, i) => ({ id: i, label: ent, x: 50 + (i * 10), y: 50 + (i * 5) }))
+        })
+    }, [])
+
+    // ─── Auto-restore last run ───────────────────────────────────────
+    React.useEffect(() => {
+        const lastJobId = sessionStorage.getItem("lastAnalysisJobId")
+        if (!lastJobId) return
+
+        let isMounted = true
+        const restoreJob = async () => {
+            try {
+                const token = await getToken()
+                const data = await analysisApi.getById(token, lastJobId)
+                if (isMounted && data && data.status === "Completed") {
+                    setUrl(data.url || "")
+                    hydrateResult(data, data.url)
+                }
+            } catch (err) {
+                console.error("Failed to restore analysis job:", err)
+            }
+        }
+        restoreJob()
+        return () => { isMounted = false }
+    }, [getToken, hydrateResult])
+
     const handleRunPipeline = useCallback(async () => {
         if (!url) return
 
@@ -96,6 +147,7 @@ export default function AnalysisPipeline() {
             const token = await getToken()
             const { analysis } = await analysisApi.start(token, url)
             const jobId = analysis._id
+            sessionStorage.setItem("lastAnalysisJobId", jobId)
 
             const cancel = pollJob(
                 async () => {
@@ -120,35 +172,12 @@ export default function AnalysisPipeline() {
                         }
                     } else if (status === 'Completed') {
                         cancel()
-                        setPhase(PHASE_COMPLETE)
-
-                        setExtractionResult({
-                            title: url,
-                            wordCount: "Analyzed",
-                            noiseRemoved: "HTML Cleaned",
-                            cleanText: "Semantic Analysis Complete. SEO metrics have been fully retrieved from the AIVO backend Engine.",
-                            elementsStripped: []
-                        })
-
-                        setScoringResult({
-                            overallScore: pollData.scoreInfo?.aiVisibilityScore || 0,
-                            topicMatch: (pollData.scoreInfo?.expectedCitations || 0) * 10,
-                            comprehensiveness: (pollData.semanticDensity || 0) * 10,
-                            missingSubtopics: [],
-                            strongSubtopics: []
-                        })
-
-                        const entities = pollData.entitiesFound || []
-                        setEntityResult({
-                            entitiesFound: entities.length,
-                            relationships: entities.length * 2,
-                            topEntities: entities.map(ent => ({ name: ent, type: "Entity", confidence: "High" })),
-                            graphNodes: entities.map((ent, i) => ({ id: i, label: ent, x: 50 + (i * 10), y: 50 + (i * 5) }))
-                        })
+                        toast.success("Analysis Complete!")
+                        hydrateResult(pollData, url)
                     } else if (status === 'Failed') {
                         cancel()
+                        toast.error("Analysis Failed: " + pollData.errorMessage)
                         setPhase(PHASE_IDLE)
-                        alert("Analysis Failed: " + pollData.errorMessage)
                     }
                 },
                 2000
@@ -535,19 +564,31 @@ export default function AnalysisPipeline() {
                         <Badge variant="outline" className="text-xs font-bold text-chart-2 border-chart-2/30 bg-chart-2/5 px-3 py-1">
                             <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Pipeline Complete
                         </Badge>
-                        <Button variant="outline" size="sm" onClick={handleExport}>
-                            <AnimatePresence mode="wait">
-                                {isExporting ? (
-                                    <motion.div key="check" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} className="flex items-center">
-                                        <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Downloaded!
-                                    </motion.div>
-                                ) : (
-                                    <motion.div key="export" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} className="flex items-center">
-                                        <FileText className="w-3.5 h-3.5 mr-1.5" /> Export Full Report
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </Button>
+                        <div className="flex gap-2">
+                            <Button variant="outline" size="sm" onClick={() => downloadCSV("aivo_analysis_data.csv", [{
+                                url: extractionResult?.title,
+                                cleanWords: extractionResult?.wordCount,
+                                semanticScore: scoringResult?.overallScore,
+                                topicMatch: scoringResult?.topicMatch,
+                                comprehensiveness: scoringResult?.comprehensiveness,
+                                entitiesFound: entityResult?.entitiesFound,
+                            }])}>
+                                <FileText className="w-3.5 h-3.5 mr-1.5" /> Export CSV
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={handleExport}>
+                                <AnimatePresence mode="wait">
+                                    {isExporting ? (
+                                        <motion.div key="check" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} className="flex items-center">
+                                            <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Downloaded!
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div key="export" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} className="flex items-center">
+                                            <FileText className="w-3.5 h-3.5 mr-1.5" /> Export PDF
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </Button>
+                        </div>
                     </div>
 
                     <Tabs value={activeTab} onValueChange={setActiveTab}>
