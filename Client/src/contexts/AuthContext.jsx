@@ -10,6 +10,19 @@ export function AuthProvider({ children }) {
     // For now we mock onboarding status
     const [isOnboarded, setIsOnboarded] = useState(true)
 
+    // Mock profile data to prevent ProfilePage crashes
+    const [profile, setProfile] = useState({
+        firstName: '',
+        lastName: '',
+        jobTitle: '',
+        bio: '',
+        avatarUrl: ''
+    })
+
+    const updateProfile = (updates) => {
+        setProfile(prev => ({ ...prev, ...updates }))
+    }
+
     // Map Clerk user to our auth user structure
     const user = clerkUser ? {
         email: clerkUser.primaryEmailAddress?.emailAddress,
@@ -32,10 +45,12 @@ export function AuthProvider({ children }) {
 
     const value = {
         user,
+        profile,
         isAuthenticated,
         isOnboarded,
         isLoading: !isLoaded,
         completeOnboarding,
+        updateProfile,
         logout,
         getToken,
     }

@@ -13,7 +13,7 @@ import jsPDF from "jspdf"
 import { useAuth } from "@/contexts/AuthContext"
 import { simulationApi, pollJob } from "@/services/api"
 import { toast } from "sonner"
-
+import { exportSimulationPDF } from "@/lib/exportUtils"
 // --- Brand SVG Icons --------------------------------------------------------
 const OpenAIIcon = ({ className = "w-4 h-4" }) => (
     <svg viewBox="0 0 24 24" fill="none" className={className}>
@@ -285,156 +285,12 @@ export default function AISimulation() {
         }
     }
 
+
+
     const handleExport = () => {
         if (!results) return
         setIsExporting(true)
-
-        const doc = new jsPDF({ unit: "mm", format: "a4" })
-        const pageW = doc.internal.pageSize.getWidth()
-        const mL = 18, mR = 18
-        const cW = pageW - mL - mR
-        let y = 20
-
-        const checkPage = (need = 20) => { if (y + need > 275) { doc.addPage(); y = 20 } }
-
-        // ── Header ──────────────────────────────────────
-        doc.setFillColor(30, 27, 56)
-        doc.rect(0, 0, pageW, 38, "F")
-        doc.setFont("helvetica", "bold")
-        doc.setFontSize(22)
-        doc.setTextColor(255, 255, 255)
-        doc.text("AIVO", mL, 17)
-        doc.setFontSize(10)
-        doc.setFont("helvetica", "normal")
-        doc.text("AI Simulation Report", mL, 25)
-        doc.setFontSize(8)
-        doc.setTextColor(180, 180, 220)
-        doc.text(`Generated: ${new Date().toLocaleString()}`, mL, 32)
-        const srcText = inputMode === "url" ? `Source: ${url}` : "Source: Pasted Content"
-        doc.text(srcText, pageW - mR - doc.getTextWidth(srcText), 32)
-        y = 48
-
-        // ── Per-model sections ──────────────────────────
-        const entries = Object.entries(results)
-        entries.forEach(([modelId, result], idx) => {
-            const model = AI_MODELS.find(m => m.id === modelId)
-            if (!model) return
-
-            checkPage(60)
-
-            // Section header bar
-            doc.setFillColor(88, 80, 230)
-            doc.roundedRect(mL, y, cW, 8, 1, 1, "F")
-            doc.setFont("helvetica", "bold")
-            doc.setFontSize(11)
-            doc.setTextColor(255, 255, 255)
-            doc.text(`${idx + 1}. ${model.name} (${model.version})`, mL + 4, y + 5.5)
-            y += 13
-
-            // Score + Citation row
-            doc.setFont("helvetica", "bold")
-            doc.setFontSize(22)
-            const sc = result.visibilityScore
-            if (sc >= 80) doc.setTextColor(34, 170, 100)
-            else if (sc >= 60) doc.setTextColor(200, 150, 30)
-            else doc.setTextColor(200, 50, 50)
-            doc.text(`${sc}`, mL, y + 2)
-
-            doc.setFont("helvetica", "normal")
-            doc.setFontSize(9)
-            doc.setTextColor(80, 80, 80)
-            doc.text(`/ 100   |   Citation Likelihood: ${result.citationLikelihood}`, mL + 16, y)
-            y += 10
-
-            // Simulated Response
-            doc.setFont("helvetica", "bold")
-            doc.setFontSize(8)
-            doc.setTextColor(100, 100, 120)
-            doc.text("SIMULATED AI RESPONSE", mL, y)
-            y += 5
-            doc.setFont("helvetica", "normal")
-            doc.setFontSize(9)
-            doc.setTextColor(60, 60, 60)
-            const respLines = doc.splitTextToSize(result.simulatedResponse, cW)
-            respLines.forEach(line => {
-                checkPage(5)
-                doc.text(line, mL, y)
-                y += 4.5
-            })
-            y += 4
-
-            // Key Signals
-            checkPage(15)
-            doc.setFont("helvetica", "bold")
-            doc.setFontSize(8)
-            doc.setTextColor(100, 100, 120)
-            doc.text("KEY SIGNALS", mL, y)
-            y += 5
-            doc.setFont("helvetica", "normal")
-            doc.setFontSize(9)
-            doc.setTextColor(60, 60, 60)
-            result.keySignals.forEach(sig => {
-                checkPage(5)
-                doc.text(`  \u2022 ${sig}`, mL, y)
-                y += 4.5
-            })
-            y += 8
-        })
-
-        // ── Comparison Summary ──────────────────────────
-        const scores = entries.map(([, r]) => r.visibilityScore)
-        const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
-        const bestEntry = entries.reduce((best, curr) => curr[1].visibilityScore > best[1].visibilityScore ? curr : best)
-        const bestModel = AI_MODELS.find(m => m.id === bestEntry[0])
-
-        checkPage(30)
-        doc.setFillColor(88, 80, 230)
-        doc.roundedRect(mL, y, cW, 8, 1, 1, "F")
-        doc.setFont("helvetica", "bold")
-        doc.setFontSize(11)
-        doc.setTextColor(255, 255, 255)
-        doc.text("Comparison Summary", mL + 4, y + 5.5)
-        y += 14
-
-        doc.setFont("helvetica", "normal")
-        doc.setFontSize(9)
-        doc.setTextColor(60, 60, 60)
-        doc.text(`Best Performer: ${bestModel?.name} (${bestEntry[1].visibilityScore}%)`, mL, y)
-        y += 5
-        doc.text(`Average Score: ${avg}%`, mL, y)
-        y += 5
-        doc.text(`Models Tested: ${entries.length}`, mL, y)
-        y += 8
-
-        doc.setFont("helvetica", "bold")
-        doc.setFontSize(8)
-        doc.setTextColor(100, 100, 120)
-        doc.text("TOP RECOMMENDATIONS", mL, y)
-        y += 5
-        doc.setFont("helvetica", "normal")
-        doc.setFontSize(9)
-        doc.setTextColor(60, 60, 60)
-            ;["Add concise Q&A-format headers", "Strengthen explicit factual claims", "Reduce promotional language below 5%"].forEach(r => {
-                checkPage(5)
-                doc.text(`  \u2022 ${r}`, mL, y)
-                y += 4.5
-            })
-
-        // ── Footer ──────────────────────────────────────
-        const pages = doc.internal.getNumberOfPages()
-        for (let p = 1; p <= pages; p++) {
-            doc.setPage(p)
-            doc.setFillColor(30, 27, 56)
-            doc.rect(0, 287, pageW, 10, "F")
-            doc.setFont("helvetica", "normal")
-            doc.setFontSize(7)
-            doc.setTextColor(150, 150, 190)
-            doc.text("AIVO \u2014 AI Simulation Playground", mL, 292)
-            doc.text(`Page ${p} of ${pages}`, pageW - mR - 15, 292)
-        }
-
-        doc.save(`AIVO_Simulation_${new Date().toISOString().slice(0, 10)}.pdf`)
-        setTimeout(() => setIsExporting(false), 1500)
+        exportSimulationPDF(inputMode, url, results, AI_MODELS, () => setIsExporting(false))
     }
 
     const inputValue = inputMode === "url" ? url.trim() : content.trim()

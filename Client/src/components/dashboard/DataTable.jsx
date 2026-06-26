@@ -19,11 +19,11 @@ const ENGINE_CONFIG = {
 }
 
 const MOCK_ANALYSES = [
-    { _id: "1", url: "yoursite.com/blog/aeo-guide", status: "Completed", scoreInfo: { aiVisibilityScore: 74 }, createdAt: new Date(Date.now() - 2 * 3600000).toISOString() },
-    { _id: "2", url: "yoursite.com/blog/knowledge-graph", status: "Completed", scoreInfo: { aiVisibilityScore: 88 }, createdAt: new Date(Date.now() - 5 * 3600000).toISOString() },
-    { _id: "3", url: "yoursite.com/services", status: "Completed", scoreInfo: { aiVisibilityScore: 62 }, createdAt: new Date(Date.now() - 86400000).toISOString() },
-    { _id: "4", url: "yoursite.com/blog/llm-citation", status: "Completed", scoreInfo: { aiVisibilityScore: 84 }, createdAt: new Date(Date.now() - 86400000).toISOString() },
-    { _id: "5", url: "yoursite.com/about", status: "Analyzing", scoreInfo: null, createdAt: new Date().toISOString() },
+    { _id: "1", url: "yoursite.com/blog/aeo-guide", engine: "AI Simulation", status: "Completed", scoreInfo: { aiVisibilityScore: 74 }, createdAt: new Date(Date.now() - 2 * 3600000).toISOString() },
+    { _id: "2", url: "yoursite.com/blog/knowledge-graph", engine: "Entity Graph", status: "Completed", scoreInfo: { aiVisibilityScore: 88 }, createdAt: new Date(Date.now() - 5 * 3600000).toISOString() },
+    { _id: "3", url: "yoursite.com/services", engine: "Competitor Intel", status: "Completed", scoreInfo: { aiVisibilityScore: 62 }, createdAt: new Date(Date.now() - 86400000).toISOString() },
+    { _id: "4", url: "yoursite.com/blog/llm-citation", engine: "Semantic Scoring", status: "Completed", scoreInfo: { aiVisibilityScore: 84 }, createdAt: new Date(Date.now() - 86400000).toISOString() },
+    { _id: "5", url: "yoursite.com/about", engine: "Content Extraction", status: "Analyzing", scoreInfo: null, createdAt: new Date().toISOString() },
 ]
 
 function timeAgo(isoString) {
@@ -54,14 +54,17 @@ export function DataTable({ analyses: propAnalyses }) {
                         const score = item.scoreInfo?.aiVisibilityScore ?? null
                         const scoreColor = score === null ? "text-muted-foreground" : score >= 75 ? "text-chart-2" : score >= 50 ? "text-chart-5" : "text-destructive"
                         const isComplete = item.status === "Completed"
+                        const engineName = item.engine || "Semantic Scoring"
+                        const eng = ENGINE_CONFIG[engineName] || ENGINE_CONFIG["Semantic Scoring"]
+                        const Icon = eng.icon
 
                         return (
                             <TableRow key={item._id} className="border-border/40 hover:bg-muted/30">
                                 <TableCell className="font-medium text-sm truncate max-w-[200px]">{item.url}</TableCell>
                                 <TableCell>
-                                    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-primary">
-                                        <BrainCircuit className="w-3.5 h-3.5" />
-                                        Analysis Pipeline
+                                    <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${eng.color || "text-primary"}`}>
+                                        <Icon className="w-3.5 h-3.5" />
+                                        {engineName}
                                     </span>
                                 </TableCell>
                                 <TableCell className="text-center">

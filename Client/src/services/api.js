@@ -93,6 +93,16 @@ export const llmsApi = {
   getById: (token, id) => request(`/api/llmstxt/${id}`, token),
 }
 
+// ─── Reports ───────────────────────────────────────────────────────────────────
+
+export const reportsApi = {
+  /** Fetch all aggregated reports */
+  getAll: (token) => request('/api/reports', token),
+
+  /** Delete a specific report */
+  delete: (token, engine, id) => request(`/api/reports/${encodeURIComponent(engine)}/${id}`, token, { method: 'DELETE' }),
+}
+
 // ─── Polling Helper ────────────────────────────────────────────────────────────
 
 /**

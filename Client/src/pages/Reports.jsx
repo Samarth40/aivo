@@ -1,4 +1,8 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
+import { useAuth } from '@/contexts/AuthContext'
+import { reportsApi, analysisApi, simulationApi, competitorApi, llmsApi } from '@/services/api'
+import { toast } from "sonner"
+import { jsPDF } from "jspdf"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -12,6 +16,26 @@ import {
     Scissors, BrainCircuit, Network, Swords, FlaskConical
 } from "lucide-react"
 
+import { exportAnalysisPDF, exportSimulationPDF, exportCompetitorTXT, exportLlmsTXT } from "@/lib/exportUtils"
+
+const AI_MODELS = [
+    { id: "chatgpt", name: "ChatGPT", version: "GPT-5.3" },
+    { id: "gemini", name: "Gemini 3", version: "Pro" },
+    { id: "perplexity", name: "Perplexity", version: "Deep Research" },
+    { id: "claude", name: "Claude", version: "4.5 Sonnet" },
+    { id: "grok", name: "Grok", version: "4.1" },
+    { id: "google-aio", name: "Google AI Overview", version: "SGE" },
+]
+
+const SCORE_ROWS = [
+    { key: "overall", label: "Overall" },
+    { key: "contentQuality", label: "Content Quality" },
+    { key: "semanticDepth", label: "Semantic Depth" },
+    { key: "entityCoverage", label: "Entity Coverage" },
+    { key: "structuredData", label: "Structured Data" },
+    { key: "aiReadability", label: "AI Readability" },
+]
+
 const ENGINE_ICONS = {
     "Content Extraction": { icon: Scissors, color: "text-primary" },
     "Semantic Scoring": { icon: BrainCircuit, color: "text-chart-1" },
@@ -20,13 +44,6 @@ const ENGINE_ICONS = {
     "AI Simulation": { icon: FlaskConical, color: "text-chart-4" },
 }
 
-const reports = [
-    { id: 1, name: "AI Visibility Full Audit", engine: "AI Simulation", date: "Feb 26, 2026", score: 74, size: "2.4 MB", type: "pdf" },
-    { id: 2, name: "Entity Coverage Report", engine: "Entity Graph", date: "Feb 25, 2026", score: 88, size: "1.1 MB", type: "pdf" },
-    { id: 3, name: "Competitor Gap Analysis", engine: "Competitor Intel", date: "Feb 24, 2026", score: 64, size: "3.2 MB", type: "pdf" },
-    { id: 4, name: "Semantic Score — Blog Posts", engine: "Semantic Scoring", date: "Feb 22, 2026", score: 82, size: "845 KB", type: "csv" },
-    { id: 5, name: "Content Extraction — Homepage", engine: "Content Extraction", date: "Feb 20, 2026", score: 91, size: "512 KB", type: "txt" },
-]
 
 const scheduled = [
     { id: 1, name: "Weekly Visibility Digest", frequency: "Every Monday", nextRun: "Mar 3, 2026", engines: ["AI Simulation", "Semantic Scoring"] },
@@ -34,6 +51,112 @@ const scheduled = [
 ]
 
 export default function Reports() {
+    const { getToken } = useAuth()
+    const [reportsList, setReportsList] = useState([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        const fetchReports = async () => {
+            try {
+                const token = await getToken()
+                const data = await reportsApi.getAll(token)
+                setReportsList(data.reports || [])
+            } catch (err) {
+                console.error(err)
+                toast.error("Failed to fetch reports")
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchReports()
+    }, [getToken])
+
+    const handleDelete = async (id, engine) => {
+        try {
+            const token = await getToken()
+            await reportsApi.delete(token, engine, id)
+            setReportsList(prev => prev.filter(r => r.id !== id))
+            toast.success("Report deleted successfully")
+        } catch (err) {
+            console.error(err)
+            toast.error("Failed to delete report")
+        }
+    }
+
+
+    const handleDownload = async (report) => {
+        try {
+            toast.info(`Fetching detailed data for ${report.name}...`);
+            const token = await getToken();
+
+            if (report.engine === "Semantic Scoring") {
+                const data = await analysisApi.getById(token, report.id);
+                if (data) {
+                    const extractionResult = {
+                        title: data.url || report.name || "Analyzed URL",
+                        wordCount: "Analyzed",
+                        noiseRemoved: "HTML Cleaned",
+                        cleanText: "Semantic Analysis Complete. SEO metrics have been fully retrieved from the AIVO backend Engine.",
+                        elementsStripped: []
+                    }
+                    const scoringResult = {
+                        overallScore: data.scoreInfo?.aiVisibilityScore || 0,
+                        topicMatch: (data.scoreInfo?.expectedCitations || 0) * 10,
+                        comprehensiveness: (data.semanticDensity || 0) * 10,
+                        missingSubtopics: [],
+                        strongSubtopics: []
+                    }
+                    const entities = data.entitiesFound || []
+                    const entityResult = {
+                        entitiesFound: entities.length,
+                        relationships: entities.length * 2,
+                        topEntities: entities.map(ent => ({ name: ent, type: "Entity", confidence: "High" })),
+                        graphNodes: entities.map((ent, i) => ({ id: i, label: ent, x: 50 + (i * 10), y: 50 + (i * 5) }))
+                    }
+                    exportAnalysisPDF(data.url || report.name, "", extractionResult, scoringResult, entityResult)
+                }
+            } else if (report.engine === "AI Simulation") {
+                const data = await simulationApi.getById(token, report.id);
+                if (data && data.results) {
+                    exportSimulationPDF(data.url ? "url" : "content", data.url || report.name, data.results, AI_MODELS)
+                }
+            } else if (report.engine === "Competitor Intel") {
+                const data = await competitorApi.getById(token, report.id);
+                if (data && data.results) {
+                    exportCompetitorTXT(data.results, SCORE_ROWS)
+                }
+            } else if (report.engine === "Content Extraction") {
+                const data = await llmsApi.getById(token, report.id);
+                if (data && data.results) {
+                    const { brandName, tagline, description, sections = [] } = data.results;
+                    let output = ""
+                    if (brandName) output += `# ${brandName}\n\n`
+                    if (tagline) output += `> ${tagline}\n\n`
+                    if (description) output += `${description}\n\n`
+                    sections.forEach((section) => {
+                        if (section.title) {
+                            output += `## ${section.title}\n\n`
+                            section.links.forEach((link) => {
+                                if (link.label && link.url) {
+                                    output += `- [${link.label}](${link.url})\n`
+                                } else if (link.label) {
+                                    output += `- ${link.label}\n`
+                                }
+                            })
+                            if (section.links.some(l => l.label || l.url)) output += "\n"
+                        }
+                    })
+                    exportLlmsTXT(output.trim() || JSON.stringify(data.results, null, 2))
+                }
+            }
+
+            toast.success(`Successfully downloaded report`);
+        } catch (err) {
+            console.error("Download error:", err);
+            toast.error("Failed to fetch detailed data or generate report");
+        }
+    }
+
     return (
         <div className="flex-1 space-y-5 pt-6 animate-in fade-in duration-500">
             {/* Header */}
@@ -60,7 +183,7 @@ export default function Reports() {
                     <CardContent className="py-4 px-5 flex items-center justify-between">
                         <div>
                             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Total Reports</p>
-                            <p className="text-2xl font-black mt-0.5">{reports.length}</p>
+                            <p className="text-2xl font-black mt-0.5">{reportsList.length}</p>
                         </div>
                         <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
                             <FileText className="w-4 h-4 text-primary" />
@@ -113,7 +236,22 @@ export default function Reports() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {reports.map((r) => {
+                                    {loading ? (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="h-24 text-center">
+                                                <div className="flex justify-center items-center gap-2">
+                                                    <span className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                                                    <span className="text-muted-foreground text-sm font-medium">Loading reports...</span>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : reportsList.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="h-24 text-center text-muted-foreground text-sm">
+                                                No reports generated yet.
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : reportsList.map((r) => {
                                         const eng = ENGINE_ICONS[r.engine] || {}
                                         const Icon = eng.icon || FileText
                                         const scoreColor = r.score >= 80 ? "text-chart-2" : r.score >= 60 ? "text-chart-5" : "text-destructive"
@@ -142,10 +280,10 @@ export default function Reports() {
                                                 <TableCell className="text-xs text-muted-foreground">{r.date}</TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex items-center justify-end gap-1">
-                                                        <Button variant="ghost" size="icon" className="h-7 w-7">
+                                                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleDownload(r)}>
                                                             <Download className="w-3.5 h-3.5 text-muted-foreground" />
                                                         </Button>
-                                                        <Button variant="ghost" size="icon" className="h-7 w-7">
+                                                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleDelete(r.id, r.engine)}>
                                                             <Trash2 className="w-3.5 h-3.5 text-muted-foreground" />
                                                         </Button>
                                                     </div>
