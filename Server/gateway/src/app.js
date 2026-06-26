@@ -30,6 +30,7 @@ import { getDashboardStats, syncUser } from './controllers/user.controller.js';
 import { startSimulation, getSimulationResult } from './controllers/simulation.controller.js';
 import { startCompetitorAnalysis, getCompetitorResult } from './controllers/competitor.controller.js';
 import { startLlmsGeneration, getLlmsResult } from './controllers/llmstxt.controller.js';
+import { getReports, deleteReport } from './controllers/reports.controller.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -95,6 +96,10 @@ app.get('/api/competitor/:id', checkAuth, getCompetitorResult);
 // LLMs.txt Generation Routes
 app.post('/api/llmstxt', checkAuth, heavyTaskLimiter, startLlmsGeneration);
 app.get('/api/llmstxt/:id', checkAuth, getLlmsResult);
+
+// Reports Routes
+app.get('/api/reports', checkAuth, getReports);
+app.delete('/api/reports/:engine/:id', checkAuth, deleteReport);
 
 // Global Error Handler (must be last)
 app.use(errorHandler);

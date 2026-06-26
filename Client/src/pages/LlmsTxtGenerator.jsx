@@ -13,6 +13,7 @@ import {
 import { motion, AnimatePresence } from "motion/react"
 import { useAuth } from "@/contexts/AuthContext"
 import { llmsApi, pollJob } from "@/services/api"
+import { exportLlmsTXT } from "@/lib/exportUtils"
 import { toast } from "sonner"
 // ─── Helpers ─────────────────────────────────────────────────────────
 const createSection = (title = "", links = [{ label: "", url: "" }]) => ({
@@ -250,16 +251,10 @@ export default function LlmsTxtGenerator() {
         setTimeout(() => setCopied(false), 2000)
     }, [llmsTxt])
 
+
+
     const handleDownload = useCallback(() => {
-        const blob = new Blob([llmsTxt], { type: "text/plain" })
-        const dlUrl = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = dlUrl
-        a.download = "llms.txt"
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(dlUrl)
+        exportLlmsTXT(llmsTxt)
     }, [llmsTxt])
 
     const handleRestart = useCallback(() => {

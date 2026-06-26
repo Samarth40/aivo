@@ -1,5 +1,8 @@
 import User from '../models/User.js';
 import Analysis from '../models/Analysis.js';
+import Simulation from '../models/Simulation.js';
+import Competitor from '../models/Competitor.js';
+import LlmsTxt from '../models/LlmsTxt.js';
 
 export const syncUser = async (req, res, next) => {
     try {
@@ -46,13 +49,30 @@ export const getDashboardStats = async (req, res, next) => {
             ? completed.reduce((sum, a) => sum + (a.scoreInfo?.aiVisibilityScore || 0), 0) / completed.length 
             : 0;
 
+        // Fetch recent from other engines
+        const [simulations, competitors, llmstxts] = await Promise.all([
+            Simulation.find({ userId }).sort({ createdAt: -1 }).limit(5),
+            Competitor.find({ userId }).sort({ createdAt: -1 }).limit(5),
+            LlmsTxt.find({ userId }).sort({ createdAt: -1 }).limit(5),
+        ]);
+
+        let recent = [];
+        analyses.slice(0, 5).forEach(a => recent.push({...a.toObject(), engine: 'Semantic Scoring'}));
+        simulations.forEach(s => recent.push({...s.toObject(), engine: 'AI Simulation', url: s.url || 'Raw Content'}));
+        competitors.forEach(c => recent.push({...c.toObject(), engine: 'Competitor Intel', url: c.targetUrl}));
+        llmstxts.forEach(l => recent.push({...l.toObject(), engine: 'Content Extraction', url: l.url}));
+
+        recent.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
         res.json({
             stats: {
                 totalAnalyses,
                 avgScore: Math.round(avgScore),
-                domainsTracked: new Set(analyses.map(a => new URL(a.url).hostname)).size
+                domainsTracked: new Set(analyses.map(a => {
+                    try { return new URL(a.url).hostname } catch(e) { return a.url }
+                })).size
             },
-            recentAnalyses: analyses.slice(0, 5) // Return top 5 recent
+            recentAnalyses: recent.slice(0, 5) // Return top 5 recent across all engines
         });
 
     } catch (error) {
