@@ -1,0 +1,28 @@
+{
+  "https://rohitgajbhiye.tech": {
+    "before": {
+      "aiVisibilityScore": 95,
+      "semanticDensity": 9.2,
+      "expectedCitations": 8,
+      "entitiesFound": [
+        "Rohit Gajbhiye",
+        "UI/UX Designer & Frontend Developer",
+        "VanaRaksha",
+        "R-CAREER",
+        "React.js"
+      ]
+    },
+    "after": {
+      "aiVisibilityScore": 98,
+      "semanticDensity": 9.3,
+      "expectedCitations": 8,
+      "entitiesFound": [
+        "Rohit Gajbhiye",
+        "VanaRaksha",
+        "R-CAREER",
+        "UI/UX Design",
+        "Frontend Development"
+      ]
+    }
+  }
+}

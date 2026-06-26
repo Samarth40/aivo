@@ -1,0 +1,26 @@
+{
+  "before": {
+    "aiVisibilityScore": 85,
+    "semanticDensity": 9.5,
+    "expectedCitations": 1,
+    "entitiesFound": [
+      "Samarth Shinde",
+      "AI Engineer",
+      "MERN Stack Developer",
+      "AI",
+      "MERN Stack"
+    ]
+  },
+  "after": {
+    "aiVisibilityScore": 95,
+    "semanticDensity": 9.5,
+    "expectedCitations": 5,
+    "entitiesFound": [
+      "Samarth Shinde",
+      "AI Engineer",
+      "MERN Stack Developer",
+      "Artificial Intelligence",
+      "MERN Stack"
+    ]
+  }
+}
