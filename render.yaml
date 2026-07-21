@@ -38,7 +38,7 @@ services:
         sync: false   # Set to your Vercel frontend URL, e.g. https://aivo.vercel.app
 
   # ─── 2. AI Worker (Python) ───────────────────────────────────────────────────
-  - type: worker
+  - type: web
     name: aivo-worker
     runtime: python
     region: oregon

@@ -12,6 +12,8 @@ os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
 import json
 import time
 import traceback
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import redis
 from pymongo import MongoClient
 from bson.objectid import ObjectId
@@ -318,5 +320,19 @@ def listen_queue():
             time.sleep(backoff)
             backoff = min(backoff * 2, 60)  # Capped at 60 seconds
 
+def start_health_server():
+    class HealthCheckHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(b"Worker is healthy")
+    
+    port = int(os.environ.get('PORT', 10000))
+    server = HTTPServer(('0.0.0.0', port), HealthCheckHandler)
+    print(f"Health check server running on port {port}")
+    server.serve_forever()
+
 if __name__ == "__main__":
+    threading.Thread(target=start_health_server, daemon=True).start()
     listen_queue()
