@@ -35,12 +35,10 @@ export function AuthProvider({ children }) {
 
     const completeOnboarding = (onboardingData) => {
         setIsOnboarded(true)
-        console.log('[Auth] Onboarding completed:', onboardingData)
     }
 
     const logout = () => {
         signOut()
-        console.log('[Auth] Logged out')
     }
 
     const value = {

@@ -25,7 +25,6 @@ export default function ForgotPasswordForm() {
         }
         setError('')
         setIsLoading(true)
-        console.log('Password reset requested for:', email)
         setTimeout(() => {
             setIsLoading(false)
             setIsSent(true)

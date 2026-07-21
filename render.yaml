@@ -1,0 +1,65 @@
+# ─── Render Blueprint ────────────────────────────────────────────────────────────
+# Deploy with: https://render.com/deploy → point to this repo
+# Or link your repo in the Render dashboard and it auto-detects render.yaml
+#
+# IMPORTANT: After deploy, set all env vars marked `sync: false` in the
+# Render dashboard under each service's "Environment" tab.
+# ─────────────────────────────────────────────────────────────────────────────────
+
+services:
+  # ─── 1. API Gateway (Node.js / Express) ──────────────────────────────────────
+  - type: web
+    name: aivo-gateway
+    runtime: node
+    region: oregon
+    plan: free
+    rootDir: Server/gateway
+    buildCommand: npm install
+    startCommand: node src/app.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "10000"
+      - key: CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          name: aivo-redis
+          type: redis
+          property: connectionString
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false   # Set to your Vercel frontend URL, e.g. https://aivo.vercel.app
+
+  # ─── 2. AI Worker (Python) ───────────────────────────────────────────────────
+  - type: worker
+    name: aivo-worker
+    runtime: python
+    region: oregon
+    plan: free
+    rootDir: Server/ai-service
+    buildCommand: pip install -r requirements.txt
+    startCommand: python worker.py
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          name: aivo-redis
+          type: redis
+          property: connectionString
+      - key: GEMINI_API_KEY
+        sync: false
+
+  # ─── 3. Redis (Job Queue) ───────────────────────────────────────────────────
+  - type: redis
+    name: aivo-redis
+    region: oregon
+    plan: free
+    ipAllowList: []   # Allow only internal Render services

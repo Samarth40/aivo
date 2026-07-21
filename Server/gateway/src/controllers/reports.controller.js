@@ -47,13 +47,24 @@ export const getReports = async (req, res, next) => {
 
         // Map Simulation
         simulations.forEach(s => {
+            // Compute average visibility score from actual simulation results
+            let simScore = 0;
+            if (s.results && typeof s.results === 'object') {
+                const scores = Object.values(s.results)
+                    .map(r => r?.visibilityScore)
+                    .filter(v => typeof v === 'number');
+                simScore = scores.length > 0
+                    ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+                    : 0;
+            }
+            const simSize = s.results ? `${(Buffer.byteLength(JSON.stringify(s.results)) / 1024).toFixed(1)} KB` : '0 KB';
             reports.push({
                 id: s._id,
                 name: `Simulation: ${s.url ? safeHostname(s.url) : 'Raw Content'}`,
                 engine: "AI Simulation",
                 date: new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                score: 85, // Mock score for simulation
-                size: "2.4 MB",
+                score: simScore,
+                size: simSize,
                 type: "json",
                 createdAt: s.createdAt
             });
@@ -61,13 +72,15 @@ export const getReports = async (req, res, next) => {
 
         // Map Competitor
         competitors.forEach(c => {
+            const compScore = c.results?.target?.scores?.overall || 0;
+            const compSize = c.results ? `${(Buffer.byteLength(JSON.stringify(c.results)) / 1024).toFixed(1)} KB` : '0 KB';
             reports.push({
                 id: c._id,
                 name: `Competitor Intel: ${safeHostname(c.targetUrl)} vs ${safeHostname(c.competitorUrl)}`,
                 engine: "Competitor Intel",
                 date: new Date(c.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                score: 72, // Mock
-                size: "3.1 MB",
+                score: compScore,
+                size: compSize,
                 type: "pdf",
                 createdAt: c.createdAt
             });
@@ -75,13 +88,22 @@ export const getReports = async (req, res, next) => {
 
         // Map LlmsTxt
         llmstxts.forEach(l => {
+            // Score based on completeness: has brand + tagline + description + sections
+            let llmsScore = 0;
+            if (l.results) {
+                if (l.results.brandName) llmsScore += 25;
+                if (l.results.tagline) llmsScore += 25;
+                if (l.results.description) llmsScore += 25;
+                if (l.results.sections?.length > 0) llmsScore += 25;
+            }
+            const llmsSize = l.results ? `${(Buffer.byteLength(JSON.stringify(l.results)) / 1024).toFixed(1)} KB` : '0 KB';
             reports.push({
                 id: l._id,
                 name: `LLMs.txt: ${safeHostname(l.url)}`,
                 engine: "Content Extraction",
                 date: new Date(l.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                score: 95, // Mock
-                size: "512 KB",
+                score: llmsScore,
+                size: llmsSize,
                 type: "txt",
                 createdAt: l.createdAt
             });

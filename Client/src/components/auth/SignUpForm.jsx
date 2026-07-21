@@ -129,7 +129,6 @@ export default function SignUpForm() {
                 navigate('/onboarding', { replace: true })
             } else {
                 setVerificationError('Verification incomplete. Please try again.')
-                console.log('SignUp process not complete:', result.status)
             }
         } catch (err) {
             console.error('Verification error:', err)

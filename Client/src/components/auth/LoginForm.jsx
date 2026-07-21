@@ -60,7 +60,7 @@ export default function LoginForm() {
             } else if (result.status === 'NEEDS_SECOND_FACTOR') {
                 setShow2FAStep(true)
             } else {
-                console.log('SignIn process status:', result.status)
+                // Unexpected sign-in status — no action needed
             }
         } catch (err) {
             console.error('Login error:', err)

@@ -56,7 +56,6 @@ export default function Settings() {
 
         setPasswordErrors({})
         setIsChangingPassword(true)
-        console.log('Password change requested')
         setTimeout(() => {
             setIsChangingPassword(false)
             setPasswordSuccess(true)

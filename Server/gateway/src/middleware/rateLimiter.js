@@ -70,7 +70,7 @@ const makeStore = () => {
 // ─── Standard API Rate Limiter ─────────────────────────────────────────────────
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000,
+  max: parseInt(process.env.RATE_LIMIT_API, 10) || 200,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests from this IP, please try again after 15 minutes' },
@@ -79,7 +79,7 @@ export const apiLimiter = rateLimit({
 // ─── Heavy Task Rate Limiter ───────────────────────────────────────────────────
 export const heavyTaskLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 1000,
+  max: parseInt(process.env.RATE_LIMIT_HEAVY, 10) || 20,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Analysis quota exceeded. Please try again in an hour.' },

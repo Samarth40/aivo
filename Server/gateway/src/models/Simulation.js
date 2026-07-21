@@ -18,7 +18,7 @@ const simulationSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Pending', 'Completed', 'Failed'],
+    enum: ['Pending', 'Extracting/Analyzing', 'Simulating LLMs', 'Completed', 'Failed'],
     default: 'Pending'
   },
   results: {

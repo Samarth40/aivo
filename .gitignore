@@ -10,6 +10,9 @@ dist/
 build/
 .npm
 
+# Vercel
+.vercel/
+
 # Python
 __pycache__/
 *.pyc

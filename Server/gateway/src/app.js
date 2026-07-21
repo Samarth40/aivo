@@ -37,8 +37,12 @@ const PORT = process.env.PORT || 5000;
 
 // Security & Parsing
 app.use(helmet());
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',')
+  : ['http://localhost:5173', 'http://localhost:5174'];
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174'],
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json());
@@ -113,7 +117,18 @@ if (!process.env.MONGODB_URI) {
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('✅ Connected to MongoDB via Mongoose');
-    app.listen(PORT, () => console.log(`🚀 API Gateway running on port ${PORT}`));
+    const server = app.listen(PORT, () => console.log(`🚀 API Gateway running on port ${PORT}`));
+
+    // Graceful shutdown for Render / container orchestrators
+    process.on('SIGTERM', () => {
+      console.log('🛑 SIGTERM received — shutting down gracefully...');
+      server.close(() => {
+        mongoose.connection.close(false, () => {
+          console.log('👋 Connections closed. Exiting.');
+          process.exit(0);
+        });
+      });
+    });
   })
   .catch(err => {
     console.error('❌ MongoDB connection error:', err);
